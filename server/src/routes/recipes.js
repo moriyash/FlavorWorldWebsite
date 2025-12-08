@@ -31,7 +31,6 @@ const authenticateToken = async (req, res, next) => {
   }
 };
 
-// ✅ CREATE RECIPE
 router.post('/', authenticateToken, upload.any(), async (req, res) => {
   try {
     console.log('=== Recipe Creation Debug ===');
@@ -73,7 +72,6 @@ router.post('/', authenticateToken, upload.any(), async (req, res) => {
       mediaType: req.body.mediaType || 'none'
     };
 
-    // ✅ Handle image/video upload
     let mediaData = null;
     let isVideo = false;
     
@@ -88,7 +86,6 @@ router.post('/', authenticateToken, upload.any(), async (req, res) => {
       if (mediaFile) {
         isVideo = mediaFile.mimetype.startsWith('video/');
         
-        // Validate video size (max 100MB)
         if (isVideo && mediaFile.size > 100 * 1024 * 1024) {
           return res.status(400).json({ 
             message: 'Video file too large. Maximum size is 100MB.' 
@@ -97,11 +94,10 @@ router.post('/', authenticateToken, upload.any(), async (req, res) => {
         
         const base64Data = mediaFile.buffer.toString('base64');
         mediaData = `data:${mediaFile.mimetype};base64,${base64Data}`;
-        console.log(`✅ ${isVideo ? 'Video' : 'Image'} converted to base64:`, mediaFile.mimetype);
+        console.log(` ${isVideo ? 'Video' : 'Image'} converted to base64:`, mediaFile.mimetype);
       }
     }
 
-    // Check if media already in body (base64)
     if (!mediaData && req.body.image) {
       mediaData = req.body.image;
       isVideo = false;
@@ -113,9 +109,8 @@ router.post('/', authenticateToken, upload.any(), async (req, res) => {
 
     if (mediaData) {
       if (isVideo) {
-        // Check if base64 video exceeds MongoDB's 16MB limit
         const videoSizeInBytes = Buffer.byteLength(mediaData, 'utf8');
-        const maxMongoDocSize = 15 * 1024 * 1024; // 15MB to be safe (MongoDB limit is 16MB)
+        const maxMongoDocSize = 15 * 1024 * 1024; 
         
         if (videoSizeInBytes > maxMongoDocSize) {
           return res.status(400).json({ 
@@ -125,7 +120,6 @@ router.post('/', authenticateToken, upload.any(), async (req, res) => {
         
         recipeData.video = mediaData;
         recipeData.mediaType = 'video';
-        // Video duration validation happens on client side
         if (req.body.videoDuration) {
           recipeData.videoDuration = parseInt(req.body.videoDuration);
         }
@@ -138,20 +132,19 @@ router.post('/', authenticateToken, upload.any(), async (req, res) => {
     const recipe = new Recipe(recipeData);
     const savedRecipe = await recipe.save();
     
-    console.log('✅ Recipe saved successfully:', savedRecipe._id);
+    console.log(' Recipe saved successfully:', savedRecipe._id);
 
-    // ✅ Return complete recipe
     res.status(201).json({
       message: 'Recipe created successfully',
       recipe: savedRecipe.toObject()
     });
 
   } catch (error) {
-    console.error('❌ Error creating recipe:', error);
-    console.error('❌ Error name:', error.name);
-    console.error('❌ Error message:', error.message);
+    console.error(' Error creating recipe:', error);
+    console.error(' Error name:', error.name);
+    console.error(' Error message:', error.message);
     if (error.errors) {
-      console.error('❌ Validation errors:', error.errors);
+      console.error(' Validation errors:', error.errors);
     }
     res.status(500).json({ 
       message: 'Server error', 
@@ -161,7 +154,6 @@ router.post('/', authenticateToken, upload.any(), async (req, res) => {
   }
 });
 
-// GET TRENDING RECIPES (Top 3 most liked)
 router.get('/trending/top', async (req, res) => {
   try {
     if (!isMongoConnected()) {
@@ -196,7 +188,6 @@ router.get('/trending/top', async (req, res) => {
   }
 });
 
-// GET ALL RECIPES
 router.get('/', async (req, res) => {
   try {
     if (!isMongoConnected()) {
@@ -211,7 +202,6 @@ router.get('/', async (req, res) => {
   }
 });
 
-// GET SINGLE RECIPE
 router.get('/:id', async (req, res) => {
   try {
     if (!isMongoConnected()) {
@@ -231,7 +221,6 @@ router.get('/:id', async (req, res) => {
   }
 });
 
-// ✅ UPDATE RECIPE
 router.put('/:id', authenticateToken, upload.any(), async (req, res) => {
   try {
     console.log('=== Recipe Update Debug ===');
@@ -251,7 +240,6 @@ router.put('/:id', authenticateToken, upload.any(), async (req, res) => {
       return res.status(403).json({ message: 'Not authorized to update this recipe' });
     }
 
-    // Build update data
     const updateData = {
       title: req.body.title || recipe.title,
       description: req.body.description || recipe.description,
@@ -263,7 +251,6 @@ router.put('/:id', authenticateToken, upload.any(), async (req, res) => {
       servings: req.body.servings ? parseInt(req.body.servings) : recipe.servings
     };
 
-    // ✅ Handle media update
     let mediaData = null;
     let isVideo = false;
     
@@ -278,7 +265,6 @@ router.put('/:id', authenticateToken, upload.any(), async (req, res) => {
       if (mediaFile) {
         isVideo = mediaFile.mimetype.startsWith('video/');
         
-        // Validate video size (max 100MB)
         if (isVideo && mediaFile.size > 100 * 1024 * 1024) {
           return res.status(400).json({ 
             message: 'Video file too large. Maximum size is 100MB.' 
@@ -287,16 +273,14 @@ router.put('/:id', authenticateToken, upload.any(), async (req, res) => {
         
         const base64Data = mediaFile.buffer.toString('base64');
         mediaData = `data:${mediaFile.mimetype};base64,${base64Data}`;
-        console.log(`✅ ${isVideo ? 'Video' : 'Image'} updated to base64`);
+        console.log(` ${isVideo ? 'Video' : 'Image'} updated to base64`);
       }
     }
 
-    // Handle media update
     if (mediaData) {
       if (isVideo) {
-        // Check if base64 video exceeds MongoDB's 16MB limit
         const videoSizeInBytes = Buffer.byteLength(mediaData, 'utf8');
-        const maxMongoDocSize = 15 * 1024 * 1024; // 15MB to be safe
+        const maxMongoDocSize = 15 * 1024 * 1024; 
         
         if (videoSizeInBytes > maxMongoDocSize) {
           return res.status(400).json({ 
@@ -306,21 +290,19 @@ router.put('/:id', authenticateToken, upload.any(), async (req, res) => {
         
         updateData.video = mediaData;
         updateData.mediaType = 'video';
-        updateData.image = null; // Clear image if video
+        updateData.image = null; 
         if (req.body.videoDuration) {
           updateData.videoDuration = parseInt(req.body.videoDuration);
         }
       } else {
         updateData.image = mediaData;
         updateData.mediaType = 'image';
-        updateData.video = null; // Clear video if image
+        updateData.video = null; 
       }
     } else if (req.body.image) {
-      // Keep existing or use provided base64 image
       updateData.image = req.body.image;
       updateData.mediaType = 'image';
     } else if (req.body.video) {
-      // Keep existing or use provided base64 video
       updateData.video = req.body.video;
       updateData.mediaType = 'video';
       if (req.body.videoDuration) {
@@ -343,19 +325,18 @@ router.put('/:id', authenticateToken, upload.any(), async (req, res) => {
       { new: true, runValidators: true }
     );
 
-    console.log('✅ Recipe updated successfully:', updatedRecipe._id);
+    console.log(' Recipe updated successfully:', updatedRecipe._id);
 
     res.json({
       message: 'Recipe updated successfully',
       recipe: updatedRecipe.toObject()
     });
   } catch (error) {
-    console.error('❌ Error updating recipe:', error);
+    console.error(' Error updating recipe:', error);
     res.status(500).json({ message: 'Server error', error: error.message });
   }
 });
 
-// DELETE RECIPE
 router.delete('/:id', authenticateToken, async (req, res) => {
   try {
     if (!isMongoConnected()) {
@@ -381,7 +362,6 @@ router.delete('/:id', authenticateToken, async (req, res) => {
   }
 });
 
-// LIKE RECIPE
 router.post('/:id/like', authenticateToken, async (req, res) => {
   try {
     if (!isMongoConnected()) {
@@ -402,7 +382,6 @@ router.post('/:id/like', authenticateToken, async (req, res) => {
     recipe.likes.push(userId);
     await recipe.save();
 
-    // Create notification for the recipe creator
     if (recipe.userId.toString() !== userId) {
       const liker = await User.findById(userId);
       
@@ -434,7 +413,6 @@ router.post('/:id/like', authenticateToken, async (req, res) => {
   }
 });
 
-// UNLIKE RECIPE
 router.delete('/:id/like', authenticateToken, async (req, res) => {
   try {
     if (!isMongoConnected()) {
@@ -466,7 +444,6 @@ router.delete('/:id/like', authenticateToken, async (req, res) => {
   }
 });
 
-// ADD COMMENT
 router.post('/:id/comments', authenticateToken, async (req, res) => {
   try {
     if (!isMongoConnected()) {
@@ -501,7 +478,6 @@ router.post('/:id/comments', authenticateToken, async (req, res) => {
 
     console.log('Comment added');
 
-    // Create notification for the recipe creator
     if (recipe.userId.toString() !== userId) {
       await createNotification({
         type: 'comment',
@@ -536,7 +512,6 @@ router.post('/:id/comments', authenticateToken, async (req, res) => {
   }
 });
 
-// DELETE COMMENT
 router.delete('/:id/comments/:commentId', authenticateToken, async (req, res) => {
   try {
     if (!isMongoConnected()) {

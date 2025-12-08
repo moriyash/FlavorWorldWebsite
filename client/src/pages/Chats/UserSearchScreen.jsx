@@ -25,7 +25,6 @@ const UserSearchScreen = () => {
   const [creating, setCreating] = useState(false);
   const [searchTimeout, setSearchTimeout] = useState(null);
 
-  // Load following users on mount
   useEffect(() => {
     loadFollowingUsers();
   }, [currentUser]);
@@ -45,7 +44,6 @@ const UserSearchScreen = () => {
 
       if (response.ok) {
         const data = await response.json();
-        // Transform to match search results format
         const formattedUsers = data.map(user => ({
           userId: user.userId || user._id,
           userName: user.userName || user.fullName,

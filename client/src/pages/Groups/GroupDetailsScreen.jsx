@@ -74,7 +74,6 @@ const GroupDetailsScreen = () => {
 
     } catch (error) {
       console.error('Load group data error:', error);
-      // Don't show alert for network errors
     } finally {
       setLoading(false);
     }
@@ -212,15 +211,12 @@ const GroupDetailsScreen = () => {
   }
 };
 
-////
 
   const handlePostCreated = useCallback((newPost) => {
     setShowCreateModal(false);
-    // Add the new post to the top of the list immediately for instant feedback
     if (newPost) {
       setGroupPosts(prevPosts => [newPost, ...prevPosts]);
     }
-    // Also reload to ensure we have the latest data
     loadGroupPosts();
   }, [loadGroupPosts]);
 

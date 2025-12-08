@@ -1,5 +1,3 @@
-/* GroupSettingsScreen.css */
-
 .group-settings-screen {
   min-height: 100vh;
   background: linear-gradient(135deg, #FFF8F0 0%, #F7F0E6 100%);
@@ -7,7 +5,6 @@
   flex-direction: column;
 }
 
-/* Header */
 .settings-header {
   position: sticky;
   top: 0;
@@ -94,7 +91,6 @@
   display: inline-block;
 }
 
-/* Loading & Error */
 .loading-container,
 .error-container {
   flex: 1;
@@ -135,14 +131,12 @@
   margin: 0;
 }
 
-/* Content */
 .settings-content {
   flex: 1;
   overflow-y: auto;
   padding: 16px;
 }
 
-/* Section */
 .section {
   background: white;
   margin-bottom: 16px;
@@ -166,7 +160,6 @@
   margin: 0 0 20px 0;
 }
 
-/* Image Container */
 .image-container {
   position: relative;
   height: 180px;
@@ -251,7 +244,6 @@
   box-shadow: 0 4px 12px rgba(231, 76, 60, 0.3);
 }
 
-/* Input Group */
 .input-group {
   margin-bottom: 20px;
 }
@@ -291,7 +283,6 @@
   line-height: 1.5;
 }
 
-/* Category Button */
 .category-button {
   width: 100%;
   display: flex;
@@ -363,7 +354,6 @@
   font-weight: 700;
 }
 
-/* Setting Item */
 .setting-item {
   display: flex;
   justify-content: space-between;
@@ -400,7 +390,6 @@
   margin: 0;
 }
 
-/* Toggle Switch */
 .toggle-switch {
   position: relative;
   display: inline-block;
@@ -450,7 +439,6 @@ input:checked + .slider:before {
   transform: translateX(24px);
 }
 
-/* Danger Section */
 .danger-section {
   border: 2px solid var(--danger);
   border-radius: 20px;
@@ -492,7 +480,6 @@ input:checked + .slider:before {
   cursor: not-allowed;
 }
 
-/* Modal */
 .modal-overlay {
   position: fixed;
   top: 0;
@@ -609,7 +596,6 @@ input:checked + .slider:before {
   box-shadow: 0 6px 16px rgba(231, 76, 60, 0.35);
 }
 
-/* Responsive */
 @media (max-width: 768px) {
   .settings-header {
     grid-template-columns: 40px 1fr 100px;

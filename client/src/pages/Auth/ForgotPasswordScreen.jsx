@@ -91,7 +91,6 @@ export default function ForgotPasswordScreen() {
       if (result.success) {
         console.log('Reset code sent successfully');
         setResetSent(true);
-        // Navigate to reset code page if available
         if (navigate && result.resetToken) {
           navigate('/password-reset-code', {
             state: {

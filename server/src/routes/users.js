@@ -8,7 +8,6 @@ import bcrypt from 'bcryptjs';
 
 const router = express.Router();
 
-// GET USER PROFILE
 router.get('/profile/:userId', async (req, res) => {
   try {
     if (!isMongoConnected()) {
@@ -41,7 +40,6 @@ router.get('/profile/:userId', async (req, res) => {
   }
 });
 
-// UPDATE PROFILE (handler function)
 const updateUserProfile = async (req, res) => {
   try {
     console.log('=== Profile Update Debug ===');
@@ -114,11 +112,9 @@ const updateUserProfile = async (req, res) => {
   }
 };
 
-// UPDATE PROFILE routes
 router.put('/profile', updateUserProfile);
 router.patch('/profile', updateUserProfile);
 
-// CHANGE PASSWORD - Replace BOTH old routes with this single one
 router.put('/change-password', async (req, res) => {
   try {
     console.log('=== Change Password Debug ===');
@@ -158,7 +154,6 @@ router.put('/change-password', async (req, res) => {
     console.log('User found:', user.email);
     console.log('Verifying current password...');
 
-    // Use the comparePassword method from the User model
     const isCurrentPasswordValid = await user.comparePassword(currentPassword);
 
     if (!isCurrentPasswordValid) {
@@ -169,7 +164,6 @@ router.put('/change-password', async (req, res) => {
       });
     }
 
-    // Validate new password strength
     const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^\da-zA-Z]).{8,}$/;
     if (!passwordRegex.test(newPassword)) {
       return res.status(400).json({ 
@@ -178,7 +172,6 @@ router.put('/change-password', async (req, res) => {
       });
     }
 
-    // Check if new password is same as current
     if (currentPassword === newPassword) {
       return res.status(400).json({ 
         success: false,
@@ -187,7 +180,6 @@ router.put('/change-password', async (req, res) => {
     }
 
     console.log('Setting new password...');
-    // Just set the password - the pre('save') hook will hash it automatically
     user.password = newPassword;
     await user.save();
 
@@ -207,7 +199,6 @@ router.put('/change-password', async (req, res) => {
   }
 });
 
-// Also add PATCH method for compatibility
 router.patch('/change-password', async (req, res) => {
   try {
     console.log('Change password via PATCH');
@@ -243,7 +234,6 @@ router.patch('/change-password', async (req, res) => {
       });
     }
 
-    // Use comparePassword method
     const isCurrentPasswordValid = await user.comparePassword(currentPassword);
 
     if (!isCurrentPasswordValid) {
@@ -268,7 +258,6 @@ router.patch('/change-password', async (req, res) => {
       });
     }
 
-    // Set password - pre('save') hook will hash it
     user.password = newPassword;
     await user.save();
 
@@ -286,7 +275,6 @@ router.patch('/change-password', async (req, res) => {
   }
 });
 
-// UPLOAD AVATAR
 router.post('/upload-avatar', upload.single('avatar'), async (req, res) => {
   try {
     console.log('Avatar upload request received (user endpoint)');
@@ -321,7 +309,6 @@ router.post('/upload-avatar', upload.single('avatar'), async (req, res) => {
   }
 });
 
-// FOLLOW USER
 router.post('/:userId/follow', async (req, res) => {
   try {
     console.log('Following user...');
@@ -353,7 +340,6 @@ router.post('/:userId/follow', async (req, res) => {
     if (!userToFollow.followers) userToFollow.followers = [];
     if (!follower.following) follower.following = [];
     
-    // Migrate old string format to new object format if needed
     userToFollow.followers = userToFollow.followers.map(f => 
       typeof f === 'string' ? { userId: f, followedAt: new Date() } : f
     );
@@ -361,14 +347,12 @@ router.post('/:userId/follow', async (req, res) => {
       typeof f === 'string' ? { userId: f, followedAt: new Date() } : f
     );
 
-    // Check if already following (check object format)
     const isAlreadyFollowing = userToFollow.followers.some(f => f.userId === followerId);
     
     if (isAlreadyFollowing) {
       return res.status(400).json({ message: 'Already following this user' });
     }
 
-    // Add as object with timestamp
     userToFollow.followers.push({ userId: followerId, followedAt: new Date() });
     follower.following.push({ userId: userId, followedAt: new Date() });
 
@@ -400,7 +384,6 @@ router.post('/:userId/follow', async (req, res) => {
   }
 });
 
-// UNFOLLOW USER
 router.delete('/:userId/follow', async (req, res) => {
   try {
     console.log(' Unfollowing user...');
@@ -428,7 +411,6 @@ router.delete('/:userId/follow', async (req, res) => {
     if (!userToUnfollow.followers) userToUnfollow.followers = [];
     if (!follower.following) follower.following = [];
     
-    // Migrate old string format to new object format if needed
     userToUnfollow.followers = userToUnfollow.followers.map(f => 
       typeof f === 'string' ? { userId: f, followedAt: new Date() } : f
     );
@@ -436,14 +418,12 @@ router.delete('/:userId/follow', async (req, res) => {
       typeof f === 'string' ? { userId: f, followedAt: new Date() } : f
     );
 
-    // Check if following (check object format)
     const isFollowing = userToUnfollow.followers.some(f => f.userId === followerId);
     
     if (!isFollowing) {
       return res.status(400).json({ message: 'Not following this user' });
     }
 
-    // Remove from both arrays
     userToUnfollow.followers = userToUnfollow.followers.filter(f => f.userId !== followerId);
     follower.following = follower.following.filter(f => f.userId !== userId);
 
@@ -464,7 +444,6 @@ router.delete('/:userId/follow', async (req, res) => {
   }
 });
 
-// GET FOLLOW STATUS
 router.get('/:userId/follow-status/:viewerId', async (req, res) => {
   try {
     if (!isMongoConnected()) {
@@ -482,7 +461,6 @@ router.get('/:userId/follow-status/:viewerId', async (req, res) => {
       return res.status(404).json({ message: 'User not found' });
     }
 
-    // Migrate old format if needed
     if (user.followers && user.followers.length > 0 && typeof user.followers[0] === 'string') {
       user.followers = user.followers.map(f => ({ userId: f, followedAt: new Date() }));
     }
@@ -493,7 +471,6 @@ router.get('/:userId/follow-status/:viewerId', async (req, res) => {
     const followersCount = user.followers ? user.followers.length : 0;
     const followingCount = user.following ? user.following.length : 0;
     
-    // Check if viewerId is in followers array
     const isFollowing = viewerId && user.followers ? user.followers.some(f => 
       (typeof f === 'string' && f === viewerId) || 
       (typeof f === 'object' && f.userId === viewerId)
@@ -510,7 +487,6 @@ router.get('/:userId/follow-status/:viewerId', async (req, res) => {
   }
 });
 
-// SEARCH USERS
 router.get('/search', async (req, res) => {
   try {
     if (!isMongoConnected()) {
@@ -549,7 +525,6 @@ router.get('/search', async (req, res) => {
   }
 });
 
-// GET SUGGESTED USERS (Random users for suggestions)
 router.get('/suggested', async (req, res) => {
   try {
     if (!isMongoConnected()) {
@@ -561,7 +536,6 @@ router.get('/suggested', async (req, res) => {
 
     console.log(`Getting ${limit} suggested users for: ${currentUserId}`);
 
-    // Get current user to exclude people they already follow
     let excludeIds = [currentUserId];
     
     if (currentUserId && mongoose.Types.ObjectId.isValid(currentUserId)) {
@@ -571,7 +545,6 @@ router.get('/suggested', async (req, res) => {
       }
     }
 
-    // Get random users, excluding current user and people they follow
     const suggestedUsers = await User.aggregate([
       { 
         $match: { 
@@ -615,7 +588,6 @@ router.get('/suggested', async (req, res) => {
   }
 });
 
-// DELETE USER
 router.delete('/delete', async (req, res) => {
   console.log('User delete endpoint called - starting cascade deletion');
   
@@ -655,7 +627,6 @@ router.delete('/delete', async (req, res) => {
     console.log('Password provided:', password ? 'Yes' : 'No');
     console.log('Stored password hash exists:', user.password ? 'Yes' : 'No');
 
-    // Validate password before proceeding with deletion
     const isPasswordValid = await bcrypt.compare(password, user.password);
     console.log('Password validation result:', isPasswordValid);
     
@@ -669,16 +640,13 @@ router.delete('/delete', async (req, res) => {
 
     console.log('Password validated successfully - Starting cascade deletion for user:', user.fullName);
 
-    // 1. Delete all notifications sent by this user (where user is the sender)
     const NotificationModel = (await import('../models/Notification.js')).default;
     const sentNotifications = await NotificationModel.deleteMany({ fromUserId: userId });
     console.log('Deleted', sentNotifications.deletedCount, 'notifications sent by user');
 
-    // 2. Delete all notifications received by this user (where user is the recipient)
     const receivedNotifications = await NotificationModel.deleteMany({ toUserId: userId });
     console.log('Deleted', receivedNotifications.deletedCount, 'notifications received by user');
 
-    // 3. Remove user from all private chats and delete chats where user is a participant
     const PrivateChatModel = (await import('../models/PrivateChat.js')).default;
     const MessageModel = (await import('../models/Message.js')).default;
     
@@ -687,16 +655,12 @@ router.delete('/delete', async (req, res) => {
     });
     
     for (const chat of userChats) {
-      // Delete all messages in this chat
       await MessageModel.deleteMany({ chatId: chat._id });
-      // Delete the chat
       await PrivateChatModel.findByIdAndDelete(chat._id);
     }
     console.log('Deleted', userChats.length, 'private chats and their messages');
 
-    // 4. Handle group memberships
     const GroupModel = (await import('../models/Group.js')).default;
-    // Find groups where user is a member
     const userGroups = await GroupModel.find({
       'members.userId': userId.toString()
     });
@@ -707,13 +671,11 @@ router.delete('/delete', async (req, res) => {
       const isAdmin = userMember?.role === 'admin';
 
       if (isCreator || (isAdmin && group.members.length === 1)) {
-        // If user is creator or last admin, delete the group
         const GroupPostModel = (await import('../models/GroupPost.js')).default;
         await GroupPostModel.deleteMany({ groupId: group._id });
         await GroupModel.findByIdAndDelete(group._id);
         console.log('Deleted group:', group.name, '(user was creator/last admin)');
       } else if (isAdmin) {
-        // Transfer admin to another member
         const otherMembers = group.members.filter(m => m.userId !== userId);
         if (otherMembers.length > 0) {
           otherMembers[0].role = 'admin';
@@ -722,18 +684,15 @@ router.delete('/delete', async (req, res) => {
         await group.save();
         console.log('Transferred admin and removed user from group:', group.name);
       } else {
-        // Just remove the member
         group.members = group.members.filter(m => m.userId !== userId);
         await group.save();
         console.log('Removed user from group:', group.name);
       }
     }
 
-    // 5. Handle group chats
     const GroupChatModel = (await import('../models/GroupChat.js')).default;
     const GroupChatMessageModel = (await import('../models/GroupChatMessage.js')).default;
     
-    // Find group chats where user is a participant
     const userGroupChats = await GroupChatModel.find({
       'participants.userId': userId.toString()
     });
@@ -743,19 +702,16 @@ router.delete('/delete', async (req, res) => {
       const isAdmin = userParticipant?.role === 'admin';
 
       if (groupChat.participants.length === 1) {
-        // Last participant - delete the chat and all messages
         await GroupChatMessageModel.deleteMany({ groupChatId: groupChat._id });
         await GroupChatModel.findByIdAndDelete(groupChat._id);
         console.log('Deleted group chat and messages (last participant)');
       } else if (isAdmin) {
-        // Transfer admin to another participant, keep messages
         const otherParticipants = groupChat.participants.filter(p => p.userId !== userId);
         if (otherParticipants.length > 0) {
           otherParticipants[0].role = 'admin';
         }
         groupChat.participants = otherParticipants;
         
-        // Remove from unread count map
         if (groupChat.unreadCount) {
           delete groupChat.unreadCount[userId];
           groupChat.markModified('unreadCount');
@@ -764,10 +720,8 @@ router.delete('/delete', async (req, res) => {
         await groupChat.save();
         console.log('Transferred admin and removed user from group chat (messages kept)');
       } else {
-        // Just remove the participant, keep messages
         groupChat.participants = groupChat.participants.filter(p => p.userId !== userId);
         
-        // Remove from unread count map
         if (groupChat.unreadCount) {
           delete groupChat.unreadCount[userId];
           groupChat.markModified('unreadCount');
@@ -778,7 +732,6 @@ router.delete('/delete', async (req, res) => {
       }
     }
 
-    // 6. Remove user from followers/following of other users
     const followerIds = (user.followers || []).map(f => 
       typeof f === 'string' ? f : f.userId
     );
@@ -786,31 +739,26 @@ router.delete('/delete', async (req, res) => {
       typeof f === 'string' ? f : f.userId
     );
 
-    // Remove this user from other users' following lists
     await User.updateMany(
       { _id: { $in: followerIds } },
       { $pull: { following: { userId: userId } } }
     );
     console.log('Removed user from', followerIds.length, 'users\' following lists');
 
-    // Remove this user from other users' followers lists
     await User.updateMany(
       { _id: { $in: followingIds } },
       { $pull: { followers: { userId: userId } } }
     );
     console.log('Removed user from', followingIds.length, 'users\' followers lists');
 
-    // 7. Delete all user's recipes
     const RecipeModel = (await import('../models/Recipe.js')).default;
     const deletedRecipes = await RecipeModel.deleteMany({ userId: userId });
     console.log('Deleted', deletedRecipes.deletedCount, 'recipes');
 
-    // 8. Delete all user's group posts
     const GroupPostModel = (await import('../models/GroupPost.js')).default;
     const deletedGroupPosts = await GroupPostModel.deleteMany({ userId: userId });
     console.log('Deleted', deletedGroupPosts.deletedCount, 'group posts');
 
-    // 9. Finally, delete the user
     await User.findByIdAndDelete(userId);
     console.log('User account deleted successfully');
 
@@ -841,7 +789,6 @@ router.delete('/delete', async (req, res) => {
   }
 });
 
-// GET FOLLOWERS LIST
 router.get('/:userId/followers', async (req, res) => {
   try {
     if (!isMongoConnected()) {
@@ -864,7 +811,6 @@ router.get('/:userId/followers', async (req, res) => {
       typeof f === 'string' ? f : f.userId
     );
     
-    // Create a map of userId to followedAt timestamp
     const followerTimestamps = {};
     (user.followers || []).forEach(f => {
       if (typeof f === 'object' && f.userId) {
@@ -872,7 +818,6 @@ router.get('/:userId/followers', async (req, res) => {
       }
     });
     
-    // Manually fetch follower users since followers is an array of strings/objects, not ObjectIds
     const followerUsers = await User.find(
       { _id: { $in: followerIds } },
       'fullName email avatar bio'
@@ -897,7 +842,6 @@ router.get('/:userId/followers', async (req, res) => {
   }
 });
 
-// GET FOLLOWING LIST
 router.get('/:userId/following', async (req, res) => {
   try {
     if (!isMongoConnected()) {
@@ -920,7 +864,6 @@ router.get('/:userId/following', async (req, res) => {
       typeof f === 'string' ? f : f.userId
     );
     
-    // Create a map of userId to followedAt timestamp
     const followingTimestamps = {};
     (user.following || []).forEach(f => {
       if (typeof f === 'object' && f.userId) {
@@ -928,7 +871,6 @@ router.get('/:userId/following', async (req, res) => {
       }
     });
     
-    // Manually fetch following users since following is an array of strings/objects, not ObjectIds
     const followingUsers = await User.find(
       { _id: { $in: followingIds } },
       'fullName email avatar bio'

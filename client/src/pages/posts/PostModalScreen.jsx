@@ -46,7 +46,6 @@ const PostModalScreen = () => {
     loadPost();
   }, [postId]);
 
-  // Load user details for likes when switching to likes tab
   useEffect(() => {
     if (activeTab === 'likes' && post && post.likes?.length > 0 && likesWithUsers.length === 0) {
       loadLikesWithUsers();
@@ -91,7 +90,6 @@ const PostModalScreen = () => {
     }
   };
 
-  // Load user details for each like
   const loadLikesWithUsers = async () => {
     if (!post?.likes || post.likes.length === 0) return;
 

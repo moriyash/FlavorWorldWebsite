@@ -1,5 +1,3 @@
-// server/tests/helpers/mongoMemoryServer.js
-
 import { MongoMemoryServer } from 'mongodb-memory-server';
 import mongoose from 'mongoose';
 

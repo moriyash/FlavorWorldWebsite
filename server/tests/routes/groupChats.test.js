@@ -1,21 +1,16 @@
-// tests/routes/groupChats.test.js
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import request from 'supertest';
 import express from 'express';
 import mongoose from 'mongoose';
 
-// Import route
 import groupChatsRouter from '../../src/routes/groupChats.js';
 
-// Import models
 import GroupChat from '../../src/models/GroupChat.js';
 import GroupChatMessage from '../../src/models/GroupChatMessage.js';
 import User from '../../src/models/User.js';
 
-// Import database
 import * as database from '../../src/config/database.js';
 
-// Create Express app for testing
 const app = express();
 app.use(express.json());
 app.use('/api/groupChats', groupChatsRouter);
@@ -24,7 +19,6 @@ describe('Group Chats Routes - Unit Tests', () => {
   let user1, user2, user3, user4;
   let groupChat1;
 
-  // Helper functions
   const createTestUser = async (overrides = {}) => {
     return await User.create({
       fullName: 'Test User',
@@ -77,7 +71,6 @@ describe('Group Chats Routes - Unit Tests', () => {
   };
 
   beforeEach(async () => {
-    // Create test users
     user1 = await createTestUser({
       fullName: 'Alice Johnson',
       email: 'alice@test.com'
@@ -98,14 +91,12 @@ describe('Group Chats Routes - Unit Tests', () => {
       email: 'diana@test.com'
     });
 
-    // Create a test group chat
     groupChat1 = await createTestGroupChat(
       user1._id,
       [user2._id, user3._id]
     );
   });
 
-  // POST / - Create Group Chat
   describe('POST / - Create Group Chat', () => {
     it('should create group chat successfully', async () => {
       const response = await request(app)
@@ -120,7 +111,7 @@ describe('Group Chats Routes - Unit Tests', () => {
       expect(response.status).toBe(201);
       expect(response.body.name).toBe('New Group Chat');
       expect(response.body.adminId).toBe(user1._id.toString());
-      expect(response.body.participants).toHaveLength(3); // creator + 2 participants
+      expect(response.body.participants).toHaveLength(3); 
     });
 
     it('should add creator as admin', async () => {
@@ -150,7 +141,6 @@ describe('Group Chats Routes - Unit Tests', () => {
 
       expect(response.status).toBe(201);
 
-      // Check system message was created
       const messages = await GroupChatMessage.find({
         groupChatId: response.body._id,
         isSystemMessage: true
@@ -259,12 +249,10 @@ describe('Group Chats Routes - Unit Tests', () => {
     });
   });
 
-  // GET /my - Get My Group Chats
   describe('GET /my - Get My Group Chats', () => {
     let groupChat2;
 
     beforeEach(async () => {
-      // Create another group chat
       groupChat2 = await createTestGroupChat(
         user2._id,
         [user1._id]
@@ -282,7 +270,6 @@ describe('Group Chats Routes - Unit Tests', () => {
     });
 
     it('should sort by updatedAt descending', async () => {
-      // Update groupChat2 to be more recent
       groupChat2.updatedAt = new Date(Date.now() + 10000);
       await groupChat2.save();
 
@@ -333,7 +320,6 @@ describe('Group Chats Routes - Unit Tests', () => {
     });
   });
 
-  // GET /:chatId - Get Single Group Chat
   describe('GET /:chatId - Get Single Group Chat', () => {
     it('should get group chat successfully', async () => {
       const response = await request(app)
@@ -355,7 +341,6 @@ describe('Group Chats Routes - Unit Tests', () => {
     });
 
     it('should include unread count', async () => {
-      // Set unread count
       groupChat1.unreadCount.set(user1._id.toString(), 5);
       await groupChat1.save();
 
@@ -422,10 +407,8 @@ describe('Group Chats Routes - Unit Tests', () => {
     });
   });
 
-  // GET /:chatId/messages - Get Messages
   describe('GET /:chatId/messages - Get Messages', () => {
     beforeEach(async () => {
-      // Create test messages
       for (let i = 0; i < 10; i++) {
         await GroupChatMessage.create({
           groupChatId: groupChat1._id.toString(),
@@ -454,7 +437,6 @@ describe('Group Chats Routes - Unit Tests', () => {
 
       expect(response.status).toBe(200);
       
-      // Check ascending order
       for (let i = 1; i < response.body.length; i++) {
         const prev = new Date(response.body[i - 1].createdAt);
         const curr = new Date(response.body[i].createdAt);
@@ -535,7 +517,6 @@ describe('Group Chats Routes - Unit Tests', () => {
     });
   });
 
-  // POST /:chatId/messages - Send Message
   describe('POST /:chatId/messages - Send Message', () => {
     it('should send message successfully', async () => {
       const response = await request(app)
@@ -655,7 +636,6 @@ describe('Group Chats Routes - Unit Tests', () => {
     });
   });
 
-  // POST /:chatId/participants - Add Participants
   describe('POST /:chatId/participants - Add Participants', () => {
     it('should add participants successfully', async () => {
       const response = await request(app)
@@ -766,7 +746,6 @@ describe('Group Chats Routes - Unit Tests', () => {
     });
   });
 
-  // DELETE /:chatId/participants/:userId - Remove Participant
   describe('DELETE /:chatId/participants/:userId - Remove Participant', () => {
     it('should remove participant successfully', async () => {
       const response = await request(app)
@@ -855,7 +834,6 @@ describe('Group Chats Routes - Unit Tests', () => {
     });
   });
 
-  // DELETE /:chatId/leave - Leave Group Chat
   describe('DELETE /:chatId/leave - Leave Group Chat', () => {
     it('should leave group chat successfully', async () => {
       const response = await request(app)
@@ -907,7 +885,6 @@ describe('Group Chats Routes - Unit Tests', () => {
     });
 
     it('should delete chat when last participant leaves', async () => {
-      // Remove all but one participant
       await request(app)
         .delete(`/api/groupChats/${groupChat1._id}/participants/${user2._id}`)
         .set('x-user-id', user1._id.toString());
@@ -916,7 +893,6 @@ describe('Group Chats Routes - Unit Tests', () => {
         .delete(`/api/groupChats/${groupChat1._id}/participants/${user3._id}`)
         .set('x-user-id', user1._id.toString());
 
-      // Last person leaves
       const response = await request(app)
         .delete(`/api/groupChats/${groupChat1._id}/leave`)
         .set('x-user-id', user1._id.toString());
@@ -974,7 +950,6 @@ describe('Group Chats Routes - Unit Tests', () => {
     });
   });
 
-  // PUT /:chatId - Update Group Chat
   describe('PUT /:chatId - Update Group Chat', () => {
     it('should update name successfully', async () => {
       const response = await request(app)
@@ -1042,11 +1017,9 @@ describe('Group Chats Routes - Unit Tests', () => {
         .set('x-user-id', user2._id.toString())
         .send({ allowNameChange: false });
 
-      // Member can't change settings, and since there are no other changes, returns 400
       expect(response.status).toBe(400);
       expect(response.body.message).toBe('No changes provided');
       
-      // Verify settings didn't change
       const chat = await GroupChat.findById(groupChat1._id);
       expect(chat.settings.allowNameChange).toBe(true);
     });
@@ -1111,10 +1084,8 @@ describe('Group Chats Routes - Unit Tests', () => {
     });
   });
 
-  // PUT /:chatId/read - Mark as Read
   describe('PUT /:chatId/read - Mark as Read', () => {
     beforeEach(async () => {
-      // Create unread messages
       await GroupChatMessage.create({
         groupChatId: groupChat1._id.toString(),
         senderId: user2._id.toString(),
@@ -1193,10 +1164,8 @@ describe('Group Chats Routes - Unit Tests', () => {
     });
   });
 
-  // Integration & Edge Cases
   describe('Integration & Edge Cases', () => {
     it('should handle complete flow: create, send, read', async () => {
-      // 1. Create group chat
       const createResponse = await request(app)
         .post('/api/groupChats')
         .send({
@@ -1208,7 +1177,6 @@ describe('Group Chats Routes - Unit Tests', () => {
       expect(createResponse.status).toBe(201);
       const chatId = createResponse.body._id;
 
-      // 2. Send message
       const sendResponse = await request(app)
         .post(`/api/groupChats/${chatId}/messages`)
         .set('x-user-id', user1._id.toString())
@@ -1216,22 +1184,18 @@ describe('Group Chats Routes - Unit Tests', () => {
 
       expect(sendResponse.status).toBe(201);
 
-      // 3. Check unread count
       let chat = await GroupChat.findById(chatId);
       expect(chat.unreadCount.get(user2._id.toString())).toBe(1);
 
-      // 4. Mark as read
       await request(app)
         .put(`/api/groupChats/${chatId}/read`)
         .set('x-user-id', user2._id.toString());
 
-      // 5. Verify unread is zero
       chat = await GroupChat.findById(chatId);
       expect(chat.unreadCount.get(user2._id.toString())).toBe(0);
     });
 
     it('should handle adding and removing participants', async () => {
-      // Add participant
       const addResponse = await request(app)
         .post(`/api/groupChats/${groupChat1._id}/participants`)
         .set('x-user-id', user1._id.toString())
@@ -1242,7 +1206,6 @@ describe('Group Chats Routes - Unit Tests', () => {
       let chat = await GroupChat.findById(groupChat1._id);
       expect(chat.participants).toHaveLength(4);
 
-      // Remove participant
       const removeResponse = await request(app)
         .delete(`/api/groupChats/${groupChat1._id}/participants/${user4._id}`)
         .set('x-user-id', user1._id.toString());
@@ -1284,7 +1247,6 @@ describe('Group Chats Routes - Unit Tests', () => {
     });
 
     it('should handle large group chat', async () => {
-      // Create 20 participants
       const participants = [];
       for (let i = 0; i < 20; i++) {
         const user = await createTestUser({
@@ -1309,10 +1271,10 @@ describe('Group Chats Routes - Unit Tests', () => {
       const response = await request(app)
         .put(`/api/groupChats/${groupChat1._id}`)
         .set('x-user-id', user1._id.toString())
-        .send({ name: '🎉 Test Group 💬 <script>alert("xss")</script>' });
+        .send({ name: ' Test Group  <script>alert("xss")</script>' });
 
       expect(response.status).toBe(200);
-      expect(response.body.groupChat.name).toBe('🎉 Test Group 💬 <script>alert("xss")</script>');
+      expect(response.body.groupChat.name).toBe(' Test Group  <script>alert("xss")</script>');
     });
 
     it('should handle very long messages', async () => {
@@ -1328,7 +1290,6 @@ describe('Group Chats Routes - Unit Tests', () => {
     });
 
     it('should maintain unread counts per user', async () => {
-      // Send 3 messages
       for (let i = 0; i < 3; i++) {
         await request(app)
           .post(`/api/groupChats/${groupChat1._id}/messages`)
@@ -1358,7 +1319,6 @@ describe('Group Chats Routes - Unit Tests', () => {
     });
 
     it('should handle pagination across multiple pages', async () => {
-      // Create 25 messages
       for (let i = 0; i < 25; i++) {
         await GroupChatMessage.create({
           groupChatId: groupChat1._id.toString(),
@@ -1368,7 +1328,6 @@ describe('Group Chats Routes - Unit Tests', () => {
         });
       }
 
-      // Get page 1
       const page1 = await request(app)
         .get(`/api/groupChats/${groupChat1._id}/messages`)
         .query({ page: 1, limit: 10 })
@@ -1376,7 +1335,6 @@ describe('Group Chats Routes - Unit Tests', () => {
 
       expect(page1.body).toHaveLength(10);
 
-      // Get page 2
       const page2 = await request(app)
         .get(`/api/groupChats/${groupChat1._id}/messages`)
         .query({ page: 2, limit: 10 })
@@ -1387,5 +1345,4 @@ describe('Group Chats Routes - Unit Tests', () => {
   });
 });
 
-// Export helper functions
 export { createTestUser, createTestGroupChat };

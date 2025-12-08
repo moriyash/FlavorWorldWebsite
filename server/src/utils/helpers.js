@@ -24,13 +24,11 @@ const createNotification = async (notificationData, io) => {
       fromUser
     } = notificationData;
 
-    // Don't create notification if user is notifying themselves
     if (fromUserId === toUserId || fromUserId?.toString() === toUserId?.toString()) {
       console.log('Skipping self-notification');
       return { success: false, reason: 'self-notification' };
     }
 
-    // Check if similar notification already exists (within last 5 minutes)
     const fiveMinutesAgo = new Date(Date.now() - 5 * 60 * 1000);
     const existingNotification = await Notification.findOne({
       toUserId,
@@ -67,7 +65,6 @@ const createNotification = async (notificationData, io) => {
     
     console.log('Notification created:', notification.type, 'for user:', toUserId);
     
-    // Emit socket event if io is available
     if (io) {
       const userSockets = await io.in(toUserId.toString()).fetchSockets();
       if (userSockets.length > 0) {

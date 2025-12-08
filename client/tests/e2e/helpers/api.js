@@ -1,10 +1,7 @@
-// client/tests/e2e/helpers/api.js
 
 const API_URL = process.env.API_URL || 'http://localhost:3000/api';
 
-/**
- * Generic API call wrapper
- */
+
 async function apiCall(endpoint, options = {}) {
   const response = await fetch(`${API_URL}${endpoint}`, {
     headers: {
@@ -23,9 +20,7 @@ async function apiCall(endpoint, options = {}) {
   };
 }
 
-// ============================================
-// 🔐 AUTH API
-// ============================================
+//  AUTH API
 
 export const authAPI = {
   async register(userData) {
@@ -50,9 +45,7 @@ export const authAPI = {
   }
 };
 
-// ============================================
-// 👤 USER API
-// ============================================
+//  USER API
 
 export const userAPI = {
   async getProfile(userId) {
@@ -104,9 +97,7 @@ export const userAPI = {
   }
 };
 
-// ============================================
-// 🍳 RECIPE API
-// ============================================
+//  RECIPE API
 
 export const recipeAPI = {
   async create(recipeData, token) {
@@ -184,9 +175,7 @@ export const recipeAPI = {
   }
 };
 
-// ============================================
-// 👥 GROUP API
-// ============================================
+//  GROUP API
 
 export const groupAPI = {
   async create(groupData) {
@@ -279,9 +268,7 @@ export const groupAPI = {
   }
 };
 
-// ============================================
-// 📝 GROUP POST API
-// ============================================
+//  GROUP POST API
 
 export const groupPostAPI = {
   async create(groupId, postData) {
@@ -343,9 +330,7 @@ export const groupPostAPI = {
   }
 };
 
-// ============================================
-// 💬 CHAT API
-// ============================================
+//  CHAT API
 
 export const chatAPI = {
   async createPrivate(otherUserId, currentUserId) {
@@ -398,9 +383,7 @@ export const chatAPI = {
   }
 };
 
-// ============================================
-// 👥💬 GROUP CHAT API
-// ============================================
+//  GROUP CHAT API
 
 export const groupChatAPI = {
   async create(name, description, participants, creatorId) {
@@ -492,9 +475,7 @@ export const groupChatAPI = {
   }
 };
 
-// ============================================
-// 📬 NOTIFICATION API
-// ============================================
+//  NOTIFICATION API
 
 export const notificationAPI = {
   async getAll(userId) {
@@ -519,9 +500,7 @@ export const notificationAPI = {
   }
 };
 
-// ============================================
-// 📰 FEED API
-// ============================================
+//  FEED API
 
 export const feedAPI = {
   async getPersonalized(userId, type = null, page = 1, limit = 50) {
@@ -543,9 +522,9 @@ export const feedAPI = {
   }
 };
 
-// ============================================
-// 📤 UPLOAD API
-// ============================================
+
+//  UPLOAD API
+
 
 export const uploadAPI = {
   async avatar(file) {
@@ -565,9 +544,7 @@ export const uploadAPI = {
   }
 };
 
-// ============================================
-// 🧪 TEST UTILITIES
-// ============================================
+//  TEST UTILITIES
 
 export const testAPI = {
   async clearDatabase() {
@@ -581,7 +558,6 @@ export const testAPI = {
   }
 };
 
-// Export all as default for convenience
 export default {
   auth: authAPI,
   user: userAPI,

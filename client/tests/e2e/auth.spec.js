@@ -1,4 +1,3 @@
-// client/tests/e2e/auth.spec.js
 import { test, expect } from '@playwright/test';
 
 test.describe('Authentication', () => {

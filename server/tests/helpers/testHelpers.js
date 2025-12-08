@@ -1,4 +1,3 @@
-// server/tests/helpers/testHelpers.js
 import User from '../../src/models/User.js';
 import PrivateChat from '../../src/models/PrivateChat.js';
 import Message from '../../src/models/Message.js';
@@ -6,9 +5,7 @@ import Group from '../../src/models/Group.js';
 import GroupPost from '../../src/models/GroupPost.js';
 import mongoose from 'mongoose';
 
-/**
- * Create a test user with default or custom values
- */
+
 export const createTestUser = async (overrides = {}) => {
   const defaults = {
     fullName: 'Test User',
@@ -23,9 +20,7 @@ export const createTestUser = async (overrides = {}) => {
   return await User.create({ ...defaults, ...overrides });
 };
 
-/**
- * Create multiple test users at once
- */
+ 
 export const createTestUsers = async (count = 3) => {
   const users = [];
   for (let i = 0; i < count; i++) {
@@ -38,9 +33,7 @@ export const createTestUsers = async (count = 3) => {
   return users;
 };
 
-/**
- * Create a private chat between two users
- */
+ 
 export const createPrivateChat = async (user1, user2, overrides = {}) => {
   const defaults = {
     participants: [
@@ -64,9 +57,7 @@ export const createPrivateChat = async (user1, user2, overrides = {}) => {
   return await PrivateChat.create({ ...defaults, ...overrides });
 };
 
-/**
- * Create a message in a chat
- */
+
 export const createMessage = async (chatId, sender, content, overrides = {}) => {
   const defaults = {
     chatId: chatId.toString(),
@@ -80,9 +71,7 @@ export const createMessage = async (chatId, sender, content, overrides = {}) => 
   return await Message.create({ ...defaults, ...overrides });
 };
 
-/**
- * Create multiple messages for testing pagination
- */
+
 export const createMessages = async (chatId, sender, count = 10) => {
   const messages = [];
   for (let i = 0; i < count; i++) {
@@ -96,9 +85,7 @@ export const createMessages = async (chatId, sender, count = 10) => {
   return messages;
 };
 
-/**
- * Create a test group
- */
+
 export const createTestGroup = async (creator, overrides = {}) => {
   const defaults = {
     name: `Test Group ${Date.now()}`,
@@ -121,9 +108,7 @@ export const createTestGroup = async (creator, overrides = {}) => {
   return await Group.create({ ...defaults, ...overrides });
 };
 
-/**
- * Create a group post
- */
+
 export const createGroupPost = async (group, user, overrides = {}) => {
   const defaults = {
     title: `Test Post ${Date.now()}`,
@@ -144,30 +129,22 @@ export const createGroupPost = async (group, user, overrides = {}) => {
   return await GroupPost.create({ ...defaults, ...overrides });
 };
 
-/**
- * Generate a valid MongoDB ObjectId
- */
+
 export const generateObjectId = () => {
   return new mongoose.Types.ObjectId();
 };
 
-/**
- * Generate an invalid ObjectId string
- */
+
 export const generateInvalidObjectId = () => {
   return 'invalid-object-id-123';
 };
 
-/**
- * Wait for a specified amount of time (for testing timing-dependent features)
- */
+
 export const wait = (ms) => {
   return new Promise(resolve => setTimeout(resolve, ms));
 };
 
-/**
- * Clean all test data from database
- */
+
 export const cleanDatabase = async () => {
   const collections = mongoose.connection.collections;
   for (const key in collections) {
@@ -175,9 +152,7 @@ export const cleanDatabase = async () => {
   }
 };
 
-/**
- * Create a mock request object for testing
- */
+
 export const createMockRequest = (overrides = {}) => {
   return {
     body: {},
@@ -188,9 +163,7 @@ export const createMockRequest = (overrides = {}) => {
   };
 };
 
-/**
- * Create a mock response object for testing
- */
+
 export const createMockResponse = () => {
   const res = {
     statusCode: 200,
@@ -211,17 +184,12 @@ export const createMockResponse = () => {
   return res;
 };
 
-/**
- * Assert that a response has the expected status and structure
- */
 export const assertSuccessResponse = (response, expectedStatus = 200) => {
   expect(response.status).toBe(expectedStatus);
   expect(response.body).toBeDefined();
 };
 
-/**
- * Assert that a response is an error with expected message
- */
+
 export const assertErrorResponse = (response, expectedStatus, expectedMessage) => {
   expect(response.status).toBe(expectedStatus);
   expect(response.body).toHaveProperty('message');
@@ -230,9 +198,7 @@ export const assertErrorResponse = (response, expectedStatus, expectedMessage) =
   }
 };
 
-/**
- * Create test data for a complete chat scenario
- */
+
 export const setupChatScenario = async () => {
   const [user1, user2, user3] = await createTestUsers(3);
   const chat = await createPrivateChat(user1, user2);
@@ -241,14 +207,11 @@ export const setupChatScenario = async () => {
   return { user1, user2, user3, chat, messages };
 };
 
-/**
- * Create test data for a group scenario
- */
+
 export const setupGroupScenario = async () => {
   const [creator, member1, member2] = await createTestUsers(3);
   const group = await createTestGroup(creator);
   
-  // Add members to group
   group.members.push(
     { userId: member1._id.toString(), role: 'member', joinedAt: new Date() },
     { userId: member2._id.toString(), role: 'member', joinedAt: new Date() }
@@ -260,9 +223,7 @@ export const setupGroupScenario = async () => {
   return { creator, member1, member2, group, post };
 };
 
-/**
- * Verify pagination response structure
- */
+
 export const assertPaginationResponse = (response, expectedLength, maxLength) => {
   expect(response.status).toBe(200);
   expect(Array.isArray(response.body)).toBe(true);
@@ -270,9 +231,7 @@ export const assertPaginationResponse = (response, expectedLength, maxLength) =>
   expect(response.body.length).toBeLessThanOrEqual(maxLength);
 };
 
-/**
- * Create a base64 image string for testing
- */
+
 export const createBase64Image = () => {
   return 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==';
 };

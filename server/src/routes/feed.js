@@ -8,7 +8,6 @@ import GroupPost from '../models/GroupPost.js';
 
 const router = express.Router();
 
-// GET PERSONALIZED FEED
 router.get('/', async (req, res) => {
   try {
     console.log('=== Personalized Feed Request ===');
@@ -34,7 +33,6 @@ router.get('/', async (req, res) => {
       return res.status(404).json({ message: 'User not found' });
     }
 
-    // Extract userIds from following array (handles both old string format and new object format)
     const following = (user.following || []).map(f => 
       typeof f === 'string' ? f : f.userId
     );
@@ -140,7 +138,6 @@ router.get('/', async (req, res) => {
   }
 });
 
-// GET FEED STATS
 router.get('/stats', async (req, res) => {
   try {
     if (!isMongoConnected()) {
@@ -193,7 +190,6 @@ router.get('/stats', async (req, res) => {
   }
 });
 
-// GET USER GROUPS POSTS
 router.get('/my-posts', async (req, res) => {
   try {
     console.log('=== User Groups Posts Request ===');
@@ -275,7 +271,6 @@ router.get('/my-posts', async (req, res) => {
   }
 });
 
-// GET FOLLOWING POSTS
 router.get('/posts', async (req, res) => {
   try {
     console.log('=== Following Posts Request ===');
@@ -301,7 +296,6 @@ router.get('/posts', async (req, res) => {
       return res.status(404).json({ message: 'User not found' });
     }
 
-    // Extract userIds from following array (handles both old string format and new object format)
     const following = (user.following || []).map(f => 
       typeof f === 'string' ? f : f.userId
     );

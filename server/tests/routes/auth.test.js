@@ -1,17 +1,13 @@
-// tests/routes/auth.test.js
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import request from 'supertest';
 import express from 'express';
 import jwt from 'jsonwebtoken';
 import bcrypt from 'bcryptjs';
 
-// Import route
 import authRouter from '../../src/routes/auth.js';
 
-// Import models
 import User from '../../src/models/User.js';
 
-// Create Express app for testing
 const app = express();
 app.use(express.json());
 app.use('/api/auth', authRouter);
@@ -19,7 +15,6 @@ app.use('/api/auth', authRouter);
 describe('Auth Routes - Unit Tests', () => {
   let testUser;
 
-  // Helper function to create a test user
   const createTestUser = async (overrides = {}) => {
     const hashedPassword = await bcrypt.hash('Test1234!', 12);
     return await User.create({
@@ -31,11 +26,9 @@ describe('Auth Routes - Unit Tests', () => {
   };
 
   beforeEach(async () => {
-    // Create a test user for login tests
     testUser = await createTestUser();
   });
 
-  // POST /register - User Registration
   describe('POST /register - User Registration', () => {
     const validUserData = {
       fullName: 'John Doe',
@@ -66,12 +59,10 @@ describe('Auth Routes - Unit Tests', () => {
 
       expect(response.status).toBe(201);
 
-      // Verify password is hashed in database
       const user = await User.findById(response.body.user.id);
       expect(user.password).not.toBe('SecurePass123!');
       expect(user.password.startsWith('$2b$')).toBe(true);
 
-      // Verify password can be validated
       const isValid = await bcrypt.compare('SecurePass123!', user.password);
       expect(isValid).toBe(true);
     });
@@ -84,7 +75,6 @@ describe('Auth Routes - Unit Tests', () => {
       expect(response.status).toBe(201);
       expect(response.body.token).toBeDefined();
 
-      // Verify token is valid
       const decoded = jwt.verify(
         response.body.token,
         process.env.JWT_SECRET || 'your-secret-key'
@@ -122,7 +112,6 @@ describe('Auth Routes - Unit Tests', () => {
         .send({
           email: 'john@example.com',
           password: 'SecurePass123!'
-          // missing fullName and confirmPassword
         });
 
       expect(response.status).toBe(400);
@@ -155,12 +144,10 @@ describe('Auth Routes - Unit Tests', () => {
     });
 
     it('should return 400 when email already exists', async () => {
-      // First registration
       await request(app)
         .post('/api/auth/register')
         .send(validUserData);
 
-      // Try to register again with same email
       const response = await request(app)
         .post('/api/auth/register')
         .send(validUserData);
@@ -174,7 +161,6 @@ describe('Auth Routes - Unit Tests', () => {
         .post('/api/auth/register')
         .send(validUserData);
 
-      // Try with uppercase email
       const response = await request(app)
         .post('/api/auth/register')
         .send({
@@ -210,13 +196,10 @@ describe('Auth Routes - Unit Tests', () => {
           confirmPassword: 'Test1234!'
         });
 
-      // Current behavior: crashes with 500 or succeeds with empty name
-      // This is acceptable - testing that it doesn't break completely
       expect([201, 400, 500]).toContain(response.status);
     });
 
     it('should return 500 on database error', async () => {
-      // Mock User.findOne to throw error
       vi.spyOn(User, 'findOne').mockRejectedValue(new Error('DB Error'));
 
       const response = await request(app)
@@ -230,7 +213,6 @@ describe('Auth Routes - Unit Tests', () => {
     });
   });
 
-  // POST /login - User Login
   describe('POST /login - User Login', () => {
     it('should login successfully with correct credentials', async () => {
       const response = await request(app)
@@ -259,7 +241,6 @@ describe('Auth Routes - Unit Tests', () => {
       expect(response.status).toBe(200);
       expect(response.body.token).toBeDefined();
 
-      // Verify token
       const decoded = jwt.verify(
         response.body.token,
         process.env.JWT_SECRET || 'your-secret-key'
@@ -268,7 +249,6 @@ describe('Auth Routes - Unit Tests', () => {
     });
 
     it('should return user data with bio and avatar', async () => {
-      // Update test user with bio and avatar
       testUser.bio = 'Test bio';
       testUser.avatar = 'avatar.jpg';
       await testUser.save();
@@ -286,7 +266,6 @@ describe('Auth Routes - Unit Tests', () => {
     });
 
     it('should auto-hash plain text password and login', async () => {
-      // Create user with plain text password (legacy)
       const legacyUser = await User.create({
         fullName: 'Legacy User',
         email: 'legacy@example.com',
@@ -302,7 +281,6 @@ describe('Auth Routes - Unit Tests', () => {
 
       expect(response.status).toBe(200);
 
-      // Verify password was hashed
       const updatedUser = await User.findById(legacyUser._id);
       expect(updatedUser.password.startsWith('$2b$')).toBe(true);
     });
@@ -378,7 +356,6 @@ describe('Auth Routes - Unit Tests', () => {
     });
 
     it('should not reveal whether email or password is wrong', async () => {
-      // Wrong email
       const response1 = await request(app)
         .post('/api/auth/login')
         .send({
@@ -386,7 +363,6 @@ describe('Auth Routes - Unit Tests', () => {
           password: 'Test1234!'
         });
 
-      // Wrong password
       const response2 = await request(app)
         .post('/api/auth/login')
         .send({
@@ -394,7 +370,6 @@ describe('Auth Routes - Unit Tests', () => {
           password: 'WrongPassword!'
         });
 
-      // Both should return same message (security best practice)
       expect(response1.body.message).toBe(response2.body.message);
       expect(response1.body.message).toBe('Invalid email or password');
     });
@@ -416,7 +391,6 @@ describe('Auth Routes - Unit Tests', () => {
     });
   });
 
-  // POST /forgotpassword - Password Reset
   describe('POST /forgotpassword - Password Reset', () => {
     it('should send reset email for existing user', async () => {
       const response = await request(app)
@@ -485,7 +459,6 @@ describe('Auth Routes - Unit Tests', () => {
     });
   });
 
-  // Security & Integration Tests
   describe('Security & Integration', () => {
     it('should use bcrypt with sufficient rounds (10+)', async () => {
       const response = await request(app)
@@ -500,7 +473,6 @@ describe('Auth Routes - Unit Tests', () => {
       expect(response.status).toBe(201);
 
       const user = await User.findById(response.body.user.id);
-      // Bcrypt hash format: $2b$rounds$salt...
       const rounds = parseInt(user.password.split('$')[2]);
       expect(rounds).toBeGreaterThanOrEqual(10);
     });
@@ -522,12 +494,11 @@ describe('Auth Routes - Unit Tests', () => {
         process.env.JWT_SECRET || 'your-secret-key'
       );
 
-      // Check expiration (should be ~7 days from now)
       const now = Math.floor(Date.now() / 1000);
       const sevenDays = 7 * 24 * 60 * 60;
       const expiresIn = decoded.exp - now;
 
-      expect(expiresIn).toBeGreaterThan(sevenDays - 60); // Allow 60s tolerance
+      expect(expiresIn).toBeGreaterThan(sevenDays - 60); 
       expect(expiresIn).toBeLessThan(sevenDays + 60);
     });
 
@@ -539,7 +510,6 @@ describe('Auth Routes - Unit Tests', () => {
           password: 'anything'
         });
 
-      // Should fail safely, not expose DB structure
       expect(response.status).toBe(400);
       expect(response.body.message).toBe('Invalid email or password');
     });
@@ -556,7 +526,6 @@ describe('Auth Routes - Unit Tests', () => {
           confirmPassword: 'SecurePass123!'
         });
 
-      // Should handle gracefully (might succeed or fail based on DB constraints)
       expect([201, 400, 500]).toContain(response.status);
     });
 
@@ -574,7 +543,6 @@ describe('Auth Routes - Unit Tests', () => {
 
       expect(response.status).toBe(201);
 
-      // Should be able to login with special chars
       const loginResponse = await request(app)
         .post('/api/auth/login')
         .send({
@@ -600,7 +568,6 @@ describe('Auth Routes - Unit Tests', () => {
     });
 
     it('should not expose password in any response', async () => {
-      // Register
       const registerResponse = await request(app)
         .post('/api/auth/register')
         .send({
@@ -612,7 +579,6 @@ describe('Auth Routes - Unit Tests', () => {
 
       expect(registerResponse.body.user).not.toHaveProperty('password');
 
-      // Login
       const loginResponse = await request(app)
         .post('/api/auth/login')
         .send({
@@ -625,5 +591,4 @@ describe('Auth Routes - Unit Tests', () => {
   });
 });
 
-// Export helper functions for use in other test files
 export { createTestUser };

@@ -182,7 +182,6 @@ ${post.category || ''}`;
         }
       }
 
-      // Show success/failure message
       if (successCount > 0 && failCount === 0) {
         alert(`Recipe shared successfully to ${successCount} chat${successCount > 1 ? 's' : ''}!`);
       } else if (successCount > 0 && failCount > 0) {
@@ -191,7 +190,6 @@ ${post.category || ''}`;
         alert('Failed to share recipe. Please try again.');
       }
 
-      // Call onShare callback and close
       if (successCount > 0) {
         onShare?.({
           postId: post._id || post.id,

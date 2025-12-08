@@ -1,5 +1,3 @@
-/* ChatConversationScreen.css */
-
 .chat-conversation-screen {
   min-height: 100vh;
   background: linear-gradient(135deg, #FFF8F0 0%, #F7F0E6 100%);
@@ -7,7 +5,6 @@
   flex-direction: column;
 }
 
-/* Header */
 .chat-header {
   position: sticky;
   top: 0;
@@ -114,7 +111,6 @@
   box-shadow: 0 6px 16px rgba(245, 166, 35, 0.3);
 }
 
-/* Loading */
 .loading-container {
   flex: 1;
   display: flex;
@@ -135,7 +131,6 @@
   to { transform: rotate(360deg); }
 }
 
-/* Messages Container */
 .messages-container {
   flex: 1;
   overflow-y: auto;
@@ -180,7 +175,6 @@
   line-height: 1.5;
 }
 
-/* Messages */
 .message-wrapper {
   display: flex;
   align-items: flex-end;
@@ -273,7 +267,6 @@
   font-weight: 500;
 }
 
-/* Typing Indicator */
 .typing-indicator {
   display: flex;
   align-items: flex-end;
@@ -333,7 +326,6 @@
   }
 }
 
-/* Attachments Menu */
 .attachments-menu {
   display: flex;
   gap: 14px;
@@ -367,7 +359,6 @@
   box-shadow: 0 8px 20px rgba(245, 166, 35, 0.35);
 }
 
-/* Input Container */
 .input-container {
   display: flex;
   align-items: flex-end;
@@ -460,7 +451,6 @@
   box-shadow: none;
 }
 
-/* Image Modal */
 .image-modal {
   position: fixed;
   top: 0;
@@ -531,7 +521,6 @@
   }
 }
 
-/* Responsive */
 @media (max-width: 768px) {
   .message-wrapper {
     max-width: 85%;
@@ -613,7 +602,6 @@
   }
 }
 
-/* Recipe Share Card */
 .recipe-share-card {
   background: linear-gradient(135deg, #FFF8F0 0%, #F7F0E6 100%);
   border-radius: 12px;
@@ -686,7 +674,6 @@
   font-weight: 500;
 }
 
-/* Make recipe card work in message bubbles */
 .my-message .recipe-share-card {
   background: rgba(255, 255, 255, 0.15);
   border-color: rgba(255, 255, 255, 0.3);

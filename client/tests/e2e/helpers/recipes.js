@@ -1,10 +1,7 @@
-// client/tests/e2e/helpers/recipes.js
-
 const API_URL = 'http://localhost:3000/api';
 
-/**
- * Generate test recipe data
- */
+
+ 
 export function generateTestRecipe(prefix = 'e2e') {
   const timestamp = Date.now();
   const random = Math.floor(Math.random() * 1000);
@@ -21,9 +18,7 @@ export function generateTestRecipe(prefix = 'e2e') {
   };
 }
 
-/**
- * Create recipe via API
- */
+
 export async function createRecipe(recipeData, token) {
   try {
     const response = await fetch(`${API_URL}/recipes`, {
@@ -60,9 +55,7 @@ export async function createRecipe(recipeData, token) {
   }
 }
 
-/**
- * Get all recipes
- */
+
 export async function getAllRecipes() {
   try {
     const response = await fetch(`${API_URL}/recipes`);
@@ -81,9 +74,7 @@ export async function getAllRecipes() {
   }
 }
 
-/**
- * Get recipe by ID
- */
+
 export async function getRecipeById(recipeId) {
   try {
     const response = await fetch(`${API_URL}/recipes/${recipeId}`);
@@ -102,9 +93,7 @@ export async function getRecipeById(recipeId) {
   }
 }
 
-/**
- * Update recipe via API
- */
+
 export async function updateRecipe(recipeId, updateData, token) {
   try {
     const response = await fetch(`${API_URL}/recipes/${recipeId}`, {
@@ -131,9 +120,7 @@ export async function updateRecipe(recipeId, updateData, token) {
   }
 }
 
-/**
- * Delete recipe via API
- */
+
 export async function deleteRecipe(recipeId, token) {
   try {
     const response = await fetch(`${API_URL}/recipes/${recipeId}`, {
@@ -155,9 +142,7 @@ export async function deleteRecipe(recipeId, token) {
   }
 }
 
-/**
- * Like recipe via API
- */
+
 export async function likeRecipe(recipeId, token) {
   try {
     const response = await fetch(`${API_URL}/recipes/${recipeId}/like`, {
@@ -183,9 +168,7 @@ export async function likeRecipe(recipeId, token) {
   }
 }
 
-/**
- * Unlike recipe via API
- */
+
 export async function unlikeRecipe(recipeId, token) {
   try {
     const response = await fetch(`${API_URL}/recipes/${recipeId}/like`, {
@@ -211,9 +194,7 @@ export async function unlikeRecipe(recipeId, token) {
   }
 }
 
-/**
- * Add comment to recipe via API
- */
+
 export async function addComment(recipeId, commentText, token) {
   try {
     const response = await fetch(`${API_URL}/recipes/${recipeId}/comments`, {
@@ -240,9 +221,7 @@ export async function addComment(recipeId, commentText, token) {
   }
 }
 
-/**
- * Delete comment from recipe via API
- */
+
 export async function deleteComment(recipeId, commentId, token) {
   try {
     const response = await fetch(`${API_URL}/recipes/${recipeId}/comments/${commentId}`, {
@@ -264,9 +243,7 @@ export async function deleteComment(recipeId, commentId, token) {
   }
 }
 
-/**
- * Wait for recipe to appear in feed
- */
+
 export async function waitForRecipeInFeed(page, recipeTitle, timeout = 10000) {
   const startTime = Date.now();
   
@@ -274,59 +251,48 @@ export async function waitForRecipeInFeed(page, recipeTitle, timeout = 10000) {
     try {
       const recipeExists = await page.locator(`text=${recipeTitle}`).count() > 0;
       if (recipeExists) {
-        console.log(`✅ Recipe "${recipeTitle}" found in feed`);
+        console.log(` Recipe "${recipeTitle}" found in feed`);
         return true;
       }
       await page.waitForTimeout(500);
     } catch (error) {
-      // Continue waiting
     }
   }
   
-  console.error(`❌ Recipe "${recipeTitle}" not found in feed after ${timeout}ms`);
+  console.error(` Recipe "${recipeTitle}" not found in feed after ${timeout}ms`);
   return false;
 }
 
-/**
- * Navigate to home and wait for load
- */
+
+ 
 export async function navigateToHome(page) {
   await page.goto('http://localhost:5173/home');
   await page.waitForLoadState('networkidle');
   
-  // Click on "All Posts" button to ensure we see all recipes
   try {
     const allPostsButton = page.locator('button:has-text("All Posts")');
     if (await allPostsButton.isVisible({ timeout: 2000 })) {
       await allPostsButton.click();
-      await page.waitForTimeout(1500); // Wait for feed to reload
+      await page.waitForTimeout(1500); 
     }
   } catch (error) {
-    // Button might not be visible or already selected
     console.log('All Posts button not found or already selected');
   }
   
-  await page.waitForTimeout(1000); // Extra wait for feed to load
+  await page.waitForTimeout(1000); 
 }
 
-/**
- * Open create recipe modal
- */
+
 export async function openCreateRecipeModal(page) {
-  // Click on create post button
   const createButton = page.locator('button:has-text("What\'s cooking today?")');
   await createButton.click();
   
-  // Wait for modal to open
   await page.waitForSelector('.modal-container', { state: 'visible' });
   await page.waitForTimeout(500);
 }
 
-/**
- * Fill recipe form
- */
 export async function fillRecipeForm(page, recipeData) {
-  console.log('📝 Filling recipe form with:', recipeData);
+  console.log(' Filling recipe form with:', recipeData);
   
   // Title
   await page.locator('input[placeholder="What\'s cooking?"]').fill(recipeData.title);
@@ -368,12 +334,11 @@ export async function fillRecipeForm(page, recipeData) {
   // Servings
   await page.locator('input[placeholder="4"]').fill(recipeData.servings.toString());
   
-  console.log('✅ Recipe form filled successfully');
+  console.log(' Recipe form filled successfully');
 }
 
-/**
- * Submit recipe form
- */
+
+ 
 export async function submitRecipeForm(page) {
   const submitButton = page.locator('.modal-container button:has-text("Share Recipe")');
   await submitButton.click();

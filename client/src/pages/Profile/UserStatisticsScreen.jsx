@@ -60,17 +60,13 @@ const generateFollowersGrowthData = (followersData, userCreatedAt) => {
   const now = new Date();
   const accountCreationDate = userCreatedAt ? new Date(userCreatedAt) : new Date(now.getFullYear(), now.getMonth() - 5, 1);
   
-  // Start from account creation month or 5 months ago, whichever is more recent
   const startDate = new Date(Math.max(
     accountCreationDate.getTime(),
     new Date(now.getFullYear(), now.getMonth() - 5, 1).getTime()
   ));
   
-  // Calculate number of months since account creation
   const monthsSinceCreation = Math.floor((now - startDate) / (1000 * 60 * 60 * 24 * 30));
-  const monthsToShow = Math.min(monthsSinceCreation + 1, 6); // Show up to 6 months
-  
-  // Group followers by month based on their followedAt timestamp
+  const monthsToShow = Math.min(monthsSinceCreation + 1, 6); 
   const followersByMonth = {};
   
   followersData.forEach(follower => {
@@ -84,25 +80,21 @@ const generateFollowersGrowthData = (followersData, userCreatedAt) => {
     }
   });
   
-  // Build the growth data
   const months = [];
   let cumulativeCount = 0;
   
   for (let i = monthsToShow - 1; i >= 0; i--) {
     const date = new Date(now.getFullYear(), now.getMonth() - i, 1);
     
-    // Only show data if the month is after or equal to account creation
     if (date >= new Date(accountCreationDate.getFullYear(), accountCreationDate.getMonth(), 1)) {
       const monthKey = `${date.getFullYear()}-${date.getMonth()}`;
       const monthName = date.toLocaleString('en-US', { month: 'short' });
       const monthYear = date.toLocaleString('en-US', { month: 'short', year: 'numeric' });
       
-      // Add followers from this month
       if (followersByMonth[monthKey]) {
         cumulativeCount += followersByMonth[monthKey];
       }
       
-      // For current month, show total count (including followers without timestamps)
       const followers = (i === 0) ? followersData.length : cumulativeCount;
       
       months.push({
@@ -194,7 +186,6 @@ const UserStatisticsScreen = () => {
         const realUserData = statisticsService.processRealUserData(userPosts, userId);
         
         try {
-          // Get user profile for creation date
           let userCreatedAt = null;
           try {
             const userProfileResult = await userService.getUserProfile(userId);
@@ -205,7 +196,6 @@ const UserStatisticsScreen = () => {
             console.error('Error loading user profile:', error);
           }
           
-          // Get actual followers count from backend
           const followersResult = await followService.getFollowers(userId);
           if (canceled) return;
           

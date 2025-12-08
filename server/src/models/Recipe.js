@@ -41,7 +41,6 @@ const RecipeSchema = new mongoose.Schema({
   }]
 }, { timestamps: true });
 
-// Add indexes for better query performance
 RecipeSchema.index({ userId: 1, createdAt: -1 });
 RecipeSchema.index({ createdAt: -1 });
 RecipeSchema.index({ category: 1 });

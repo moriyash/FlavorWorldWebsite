@@ -9,7 +9,6 @@ export default function LoginScreen() {
   const navigate = useNavigate();
   const { login } = useAuth();
   
-  // Login form state
   const [form, setForm] = useState({
     email: '',
     password: '',
@@ -21,7 +20,6 @@ export default function LoginScreen() {
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
-  // Validation functions
   const validateEmail = (email) => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     
@@ -68,56 +66,56 @@ export default function LoginScreen() {
   };
   
   const handleLogin = async () => {
-    console.log('🔐 Login button pressed!');
-    console.log('📝 Form data:', form);
+    console.log(' Login button pressed!');
+    console.log(' Form data:', form);
     
     if (!validateForm()) {
-      console.log('❌ Form validation failed');
+      console.log(' Form validation failed');
       return;
     }
     
     setIsLoading(true);
     
     try {
-      console.log('🔄 Calling authService.login...');
+      console.log(' Calling authService.login...');
       const result = await authService.login({ 
         email: form.email, 
         password: form.password 
       });
       
-      console.log('📊 AuthService result:', result);
+      console.log('AuthService result:', result);
       
       if (result.success) {
-        console.log('✅ Login successful, processing data...');
+        console.log(' Login successful, processing data...');
         
         const { token, user } = result.data;
-        console.log('🎫 Token:', token);
-        console.log('👤 User:', user);
+        console.log('Token:', token);
+        console.log('User:', user);
         
         if (token && user) {
-          console.log('🔗 Calling context login...');
+          console.log(' Calling context login...');
           await login(token, user);
-          console.log('✅ Context login completed');
+          console.log('Context login completed');
           
           // Initialize chat service
           await chatService.initializeSocket(user);
-          console.log('💬 Chat service initialized');
+          console.log('Chat service initialized');
 
           alert(`Welcome! Hello ${user.fullName || user.name || 'Chef'}!`);
           navigate('/home'); 
         } else {
-          console.log('❌ Missing token or user data');
+          console.log('Missing token or user data');
           alert('Error: Invalid response from server');
         }
       } else {
-        console.log('❌ Login failed:', result.message);
+        console.log('Login failed:', result.message);
         alert(`Login Failed: ${result.message}`);
       }
     } catch (error) {
-      console.error('💥 Login error:', error);
+      console.error('Login error:', error);
       alert('Error: Login failed. Please try again.');
     } finally {
-      console.log('🏁 Setting loading to false');
+      console.log(' Setting loading to false');
       setIsLoading(false);
     }
   };

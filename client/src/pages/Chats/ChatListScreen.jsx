@@ -103,18 +103,16 @@ const ChatListScreen = () => {
     
     const content = message.content;
     
-    // Check if it's a recipe share
     if (content.startsWith('[RECIPE_SHARE]')) {
       try {
         const lines = content.split('\n');
-        const recipeTitle = lines[4]; // Title is on line 5 (index 4)
-        return `📖 Shared a recipe: ${recipeTitle}`;
+        const recipeTitle = lines[4]; 
+        return ` Shared a recipe: ${recipeTitle}`;
       } catch (error) {
-        return '📖 Shared a recipe';
+        return ' Shared a recipe';
       }
     }
     
-    // Regular message - truncate if too long
     return content.length > 50 ? content.substring(0, 50) + '...' : content;
   };
 

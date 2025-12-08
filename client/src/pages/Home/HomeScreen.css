@@ -1,6 +1,3 @@
-/* HomeScreen.css */
-
-/* ==== Loading Screen ==== */
 .home-screen-loading {
   display: flex;
   flex-direction: column;
@@ -28,7 +25,6 @@
   font-weight: 500;
 }
 
-/* ==== Main Container ==== */
 .home-screen-container {
   min-height: 100vh;
   display: flex;
@@ -36,7 +32,6 @@
   background: linear-gradient(135deg, #FFF8F0 0%, #F7F0E6 100%);
 }
 
-/* ==== Top Navigation ==== */
 .top-nav {
   position: fixed;
   top: 0;
@@ -178,7 +173,6 @@
   }
 }
 
-/* ==== Main Content Wrapper ==== */
 .main-content-wrapper {
   margin-top: 80px !important; 
   padding: 16px !important;
@@ -191,7 +185,6 @@
   min-height: calc(100vh - 80px);
 }
 
-/* ==== Left Sidebar ==== */
 .left-sidebar {
   position: sticky;
   top: 80px; 
@@ -237,7 +230,6 @@
   justify-content: center;
 }
 
-/* ==== Center Feed ==== */
 .center-feed {
   max-width: 680px;
   width: 100%;
@@ -282,7 +274,6 @@
   box-shadow: 0 4px 12px rgba(245, 166, 35, 0.3);
 }
 
-/* ==== Filters Panel ==== */
 .filters-panel {
   background: var(--white);
   border-radius: 16px;
@@ -407,7 +398,6 @@
   box-shadow: 0 6px 16px rgba(231, 76, 60, 0.4);
 }
 
-/* ==== Create Post Card ==== */
 .create-post-card {
   background: var(--white);
   border-radius: 16px;
@@ -463,7 +453,6 @@
   box-shadow: 0 6px 16px rgba(245, 166, 35, 0.4);
 }
 
-/* ==== Posts Feed ==== */
 .posts-feed {
   display: flex;
   flex-direction: column;
@@ -495,7 +484,6 @@
   }
 }
 
-/* ==== Feed States ==== */
 .feed-loading {
   background: var(--white);
   border-radius: 16px;
@@ -555,7 +543,6 @@
   box-shadow: 0 6px 20px rgba(245, 166, 35, 0.4);
 }
 
-/* ==== Right Sidebar ==== */
 .right-sidebar {
   position: sticky;
   top: 80px; 
@@ -698,7 +685,6 @@
   box-shadow: 0 4px 12px rgba(245, 166, 35, 0.4);
 }
 
-/* ==== Modal ==== */
 .modal-overlay {
   position: fixed;
   top: 0;
@@ -802,7 +788,6 @@
   box-shadow: 0 6px 16px rgba(231, 76, 60, 0.4);
 }
 
-/* ==== Responsive Design ==== */
 @media (max-width: 1280px) {
   .right-sidebar {
     display: none;

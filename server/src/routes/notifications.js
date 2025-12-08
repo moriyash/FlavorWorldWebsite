@@ -4,7 +4,6 @@ import Notification from '../models/Notification.js';
 
 const router = express.Router();
 
-// GET ALL NOTIFICATIONS
 router.get('/', async (req, res) => {
   try {
     console.log('Fetching notifications');
@@ -38,7 +37,6 @@ router.get('/', async (req, res) => {
   }
 });
 
-// MARK NOTIFICATION AS READ
 router.put('/:notificationId/read', async (req, res) => {
   try {
     console.log('Marking notification as read:', req.params.notificationId);
@@ -69,7 +67,6 @@ router.put('/:notificationId/read', async (req, res) => {
   }
 });
 
-// MARK ALL NOTIFICATIONS AS READ
 router.put('/mark-all-read', async (req, res) => {
   try {
     console.log('Marking all notifications as read');
@@ -101,7 +98,6 @@ router.put('/mark-all-read', async (req, res) => {
   }
 });
 
-// GET UNREAD COUNT
 router.get('/unread-count', async (req, res) => {
   try {
     if (!isMongoConnected()) {
@@ -133,7 +129,6 @@ router.get('/unread-count', async (req, res) => {
   }
 });
 
-// DELETE SINGLE NOTIFICATION
 router.delete('/:notificationId', async (req, res) => {
   try {
     console.log('Deleting notification:', req.params.notificationId);
@@ -160,7 +155,6 @@ router.delete('/:notificationId', async (req, res) => {
   }
 });
 
-// DELETE ALL NOTIFICATIONS
 router.delete('/delete-all', async (req, res) => {
   try {
     console.log('Deleting all notifications');

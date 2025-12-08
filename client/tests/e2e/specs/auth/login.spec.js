@@ -1,4 +1,3 @@
-// client/tests/e2e/specs/auth/login.spec.js
 import { test, expect } from '@playwright/test';
 import { 
   setupE2ETest, 
@@ -16,15 +15,14 @@ test.describe('User Login E2E Tests', () => {
   test.beforeAll(async () => {
     await setupE2ETest();
     
-    // Create a test user for login tests
     testUser = generateTestUser('login-user');
-    console.log('📝 Creating test user:', testUser.email);
+    console.log(' Creating test user:', testUser.email);
     
     const result = await registerUser(testUser);
-    console.log('📊 Registration result:', JSON.stringify(result, null, 2));
+    console.log(' Registration result:', JSON.stringify(result, null, 2));
     
     if (!result.success) {
-      console.error('❌ Failed to create test user:', result);
+      console.error(' Failed to create test user:', result);
       throw new Error(`Failed to create test user: ${result.error || result.message || 'Unknown error'}`);
     }
     
@@ -32,7 +30,7 @@ test.describe('User Login E2E Tests', () => {
     expect(result.user).toBeDefined();
     expect(result.token).toBeDefined();
     
-    console.log('✅ Test user created successfully for login tests');
+    console.log(' Test user created successfully for login tests');
     console.log('   Email:', testUser.email);
     console.log('   Password:', testUser.password);
   });
@@ -46,9 +44,7 @@ test.describe('User Login E2E Tests', () => {
     await page.waitForLoadState('networkidle');
   });
 
-  // ============================================
-  // ✅ POSITIVE TEST CASES
-  // ============================================
+  //  POSITIVE TEST CASES
 
   test('should display login page correctly', async ({ page }) => {
     // Check page title
@@ -73,9 +69,8 @@ test.describe('User Login E2E Tests', () => {
   });
 
   test('should login successfully with valid credentials', async ({ page }) => {
-    console.log('🧪 Testing login with:', testUser.email);
+    console.log(' Testing login with:', testUser.email);
     
-    // Setup alert handler
     let alertShown = false;
     page.on('dialog', async dialog => {
       console.log('Alert:', dialog.message());
@@ -141,9 +136,7 @@ test.describe('User Login E2E Tests', () => {
     await expect(page.locator(auth.forgotPassword.pageTitle)).toBeVisible();
   });
 
-  // ============================================
-  // ❌ NEGATIVE TEST CASES
-  // ============================================
+  //  NEGATIVE TEST CASES
 
   test('should show error for empty email', async ({ page }) => {
     // Only fill password
@@ -165,7 +158,7 @@ test.describe('User Login E2E Tests', () => {
 
   test('should show error for invalid email format', async ({ page }) => {
     await page.locator(auth.login.emailInput).fill('invalid-email');
-    await page.locator(auth.login.passwordInput).click(); // Trigger blur
+    await page.locator(auth.login.passwordInput).click(); 
     
     await page.waitForTimeout(300);
     
@@ -208,7 +201,6 @@ test.describe('User Login E2E Tests', () => {
     
     expect(alertMessage.toLowerCase()).toContain('invalid email or password');
     
-    // Should stay on login page
     expect(page.url()).toContain('/login');
   });
 
@@ -243,9 +235,7 @@ test.describe('User Login E2E Tests', () => {
     await page.waitForURL('**/home', { timeout: 10000 });
   });
 
-  // ============================================
-  // 🔒 SECURITY & UX
-  // ============================================
+  //  SECURITY & UX
 
   test('should disable submit button during login', async ({ page }) => {
     page.on('dialog', async dialog => {
@@ -280,9 +270,7 @@ test.describe('User Login E2E Tests', () => {
     await page.waitForURL('**/home', { timeout: 10000 });
   });
 
-  // ============================================
-  // ♿ ACCESSIBILITY
-  // ============================================
+  // ACCESSIBILITY
 
   test('should have proper form labels', async ({ page }) => {
     await expect(page.locator('label:has-text("Email address")')).toBeVisible();
@@ -327,9 +315,7 @@ test.describe('User Login E2E Tests', () => {
     }
   });
 
-  // ============================================
-  // 📱 RESPONSIVE
-  // ============================================
+  //  RESPONSIVE
 
   test('should work on mobile viewport', async ({ page }) => {
     await page.setViewportSize({ width: 375, height: 667 });

@@ -8,7 +8,7 @@ const sendResetEmail = async (email, code) => {
     html: `
       <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
         <div style="background: linear-gradient(135deg, #F5A623, #4ECDC4); padding: 20px; text-align: center;">
-          <h1 style="color: white; margin: 0;">🍴 FlavorWorld</h1>
+          <h1 style="color: white; margin: 0;"> FlavorWorld</h1>
         </div>
         
         <div style="padding: 30px; background: #FFF8F0;">

@@ -1,4 +1,3 @@
-// server/startE2EServer.js
 
 import { startMongoMemoryServer, stopMongoMemoryServer } from './tests/helpers/mongoMemoryServer.js';
 
@@ -6,13 +5,11 @@ async function startE2EServer() {
   try {
     console.log('Starting E2E Test Server...\n');
 
-    // 1. Start MongoDB Memory Server
     const mongoUri = await startMongoMemoryServer();
     process.env.MONGODB_E2E_URI = mongoUri;
     process.env.TEST_MODE = 'e2e';
     process.env.PORT = '3000';
 
-    // 2. Import and start app AFTER setting env vars
     const { app, server } = await import('./src/app.js');
     const { connectDB } = await import('./src/config/database.js');
     
@@ -30,7 +27,6 @@ async function startE2EServer() {
       console.log('Press Ctrl+C to stop\n');
     });
 
-    // Graceful shutdown
     process.on('SIGINT', async () => {
       console.log('Shutting down E2E server...');
       server.close();

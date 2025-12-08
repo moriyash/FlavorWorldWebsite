@@ -32,7 +32,6 @@ const SearchScreen = () => {
   const [recentSearches, setRecentSearches] = useState([]);
 
   useEffect(() => {
-    // Load recent searches from localStorage
     const saved = localStorage.getItem('recentSearches');
     if (saved) {
       setRecentSearches(JSON.parse(saved));
@@ -350,7 +349,7 @@ const SearchScreen = () => {
                               {item.isPrivate && (
                                 <>
                                   <span>•</span>
-                                  <span>🔒 Private</span>
+                                  <span> Private</span>
                                 </>
                               )}
                             </div>

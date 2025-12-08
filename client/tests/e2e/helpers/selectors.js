@@ -1,12 +1,5 @@
-// client/tests/e2e/helpers/selectors.js
-
-/**
- * E2E Selectors - Based on EXACT code from RegisterScreen.jsx, LoginScreen.jsx, etc.
- */
-
 export const auth = {
   register: {
-    // Inputs - exact placeholders from RegisterScreen.jsx
     fullNameInput: 'input[placeholder="Chef\'s Name"]',
     emailInput: 'input[placeholder="chef@FlavorWorld.com"]',
     passwordInput: 'input[placeholder="Create a strong password"]',
@@ -19,7 +12,7 @@ export const auth = {
     // Links
     loginLink: 'button.form-footer-button',
     
-    // Error messages (appear as span.error-text)
+    // Error messages 
     errorText: '.error-text',
     
     // Page elements
@@ -28,7 +21,7 @@ export const auth = {
   },
 
   login: {
-    // Inputs - exact placeholders from LoginScreen.jsx
+    // Inputs 
     emailInput: 'input[placeholder="example@flavorworld.com"]',
     passwordInput: 'input[placeholder="Enter your password"]',
     
@@ -98,7 +91,7 @@ export const recipe = {
     commentButton: 'button:has-text("Comment")',
     shareButton: 'button:has-text("Share")',
     commentInput: 'input[placeholder="Write a comment..."]',
-    commentSendButton: 'button:has(svg)', // Send icon
+    commentSendButton: 'button:has(svg)', 
     deleteButton: 'button:has-text("Delete")',
     editButton: 'button:has-text("Edit")',
   },

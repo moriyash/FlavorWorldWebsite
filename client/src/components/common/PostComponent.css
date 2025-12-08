@@ -1,12 +1,9 @@
-/* PostComponent.css */
-
 .post-component {
   background: var(--white, #FFFFFF);
   border-radius: 8px;
   overflow: hidden;
 }
 
-/* Post Header */
 .post-header {
   display: flex;
   justify-content: space-between;

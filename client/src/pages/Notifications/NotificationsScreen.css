@@ -1,13 +1,10 @@
-/* NotificationsScreen.css */
-
 .notifications-screen {
   min-height: 100vh;
-  background: linear-gradient(135deg, #FFF8F0 0%, #F7F0E6 100%); /* 👈 רקע מדורג */
+  background: linear-gradient(135deg, #FFF8F0 0%, #F7F0E6 100%); 
   display: flex;
   flex-direction: column;
 }
 
-/* Header */
 .notifications-header {
   position: fixed;
   top: 0;
@@ -86,7 +83,6 @@
   width: 80px;
 }
 
-/* Loading */
 .loading-container {
   flex: 1;
   display: flex;
@@ -115,7 +111,6 @@
   font-weight: 500;
 }
 
-/* Content */
 .notifications-content {
   flex: 1;
   margin-top: 64px;
@@ -126,7 +121,6 @@
   padding: 24px 16px;
 }
 
-/* Notifications List */
 .notifications-list {
   display: flex;
   flex-direction: column;
@@ -174,7 +168,6 @@
   box-shadow: 0 4px 16px rgba(245, 166, 35, 0.15);
 }
 
-/* Avatar & Icon */
 .notification-avatar {
   position: relative;
   flex-shrink: 0;
@@ -195,7 +188,6 @@
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
 }
 
-/* Content */
 .notification-content {
   flex: 1;
   min-width: 0;
@@ -256,7 +248,6 @@
   }
 }
 
-/* Empty State */
 .empty-state {
   display: flex;
   flex-direction: column;
@@ -318,7 +309,6 @@
   box-shadow: 0 6px 20px rgba(245, 166, 35, 0.4);
 }
 
-/* Refresh FAB */
 .refresh-fab {
   position: fixed;
   bottom: 32px;
@@ -362,7 +352,6 @@
   color: var(--primary);
 }
 
-/* Animations */
 @keyframes fadeIn {
   from {
     opacity: 0;
@@ -384,7 +373,6 @@
 .notification-item:nth-child(4) { animation-delay: 0.2s; }
 .notification-item:nth-child(5) { animation-delay: 0.25s; }
 
-/* Responsive */
 @media (max-width: 768px) {
   .notifications-content {
     padding: 16px 12px;

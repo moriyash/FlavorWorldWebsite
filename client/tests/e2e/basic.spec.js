@@ -1,4 +1,3 @@
-// client/tests/e2e/basic.spec.js
 import { test, expect } from '@playwright/test';
 import { 
   setupE2ETest, 

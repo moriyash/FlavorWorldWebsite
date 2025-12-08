@@ -10,7 +10,6 @@ const api = axios.create({
   timeout: 120000, 
 });
 
-// Interceptor for auth token
 api.interceptors.request.use(
   async (config) => {
     try {
@@ -103,22 +102,20 @@ export const recipeService = {
         };
       }
 
-      // בדיקה מפורטת של נתוני המשתמש
       if (!recipeData.userId) {
-        console.error('❌ No userId provided');
+        console.error(' No userId provided');
         return {
           success: false,
           message: 'User information is missing. Please try logging in again.'
         };
       }
 
-      // Check for media (image or video) - React File objects
       const hasMedia = mediaFile instanceof File;
       const detectedMediaType = mediaType || (hasMedia ? (
         mediaFile.type.startsWith('video/') ? 'video' : 'image'
       ) : 'none');
 
-      console.log('📊 Media info:', {
+      console.log(' Media info:', {
         hasMedia,
         mediaType: detectedMediaType,
         fileName: hasMedia ? mediaFile.name : 'none',
@@ -126,11 +123,10 @@ export const recipeService = {
       });
 
       if (hasMedia) {
-        console.log(`📸 ${detectedMediaType} detected, using FormData...`);
+        console.log(` ${detectedMediaType} detected, using FormData...`);
         
         const formData = new FormData();
         
-        // Add all basic data
         formData.append('title', recipeData.title || '');
         formData.append('description', recipeData.description || '');
         formData.append('ingredients', recipeData.ingredients || '');
@@ -144,21 +140,18 @@ export const recipeService = {
         formData.append('userAvatar', recipeData.userAvatar || '');
         formData.append('mediaType', detectedMediaType);
 
-        // Add video duration if it's a video
         if (detectedMediaType === 'video' && recipeData.videoDuration) {
           formData.append('videoDuration', recipeData.videoDuration.toString());
         }
 
-        // Add media according to type
         if (detectedMediaType === 'video') {
           formData.append('video', mediaFile);
-          console.log('🎥 Video file added to FormData');
+          console.log(' Video file added to FormData');
         } else {
           formData.append('image', mediaFile);
-          console.log('📷 Image file added to FormData');
+          console.log(' Image file added to FormData');
         }
 
-        // Timeout adapted to media type
         const uploadTimeout = detectedMediaType === 'video' ? 300000 : 120000;
 
         const response = await api.post('/recipes', formData, {
@@ -168,20 +161,19 @@ export const recipeService = {
           timeout: uploadTimeout,
           onUploadProgress: (progressEvent) => {
             const progress = Math.round((progressEvent.loaded * 100) / progressEvent.total);
-            console.log(`📊 Upload progress: ${progress}%`);
+            console.log(` Upload progress: ${progress}%`);
             
-            // Event available for components that want to show progress
             if (recipeData.onUploadProgress) {
               recipeData.onUploadProgress(progress);
             }
           }
         });
 
-        console.log(`✅ Recipe with ${detectedMediaType} uploaded successfully!`);
+        console.log(` Recipe with ${detectedMediaType} uploaded successfully!`);
         return { success: true, data: response.data };
 
       } else {
-        console.log('📄 No media, using JSON...');
+        console.log(' No media, using JSON...');
         
         const jsonData = {
           title: recipeData.title,
@@ -198,7 +190,7 @@ export const recipeService = {
           mediaType: 'none'
         };
 
-        console.log('📤 Sending JSON data:', {
+        console.log(' Sending JSON data:', {
           ...jsonData,
           userId: jsonData.userId,
           userName: jsonData.userName,
@@ -229,7 +221,6 @@ export const recipeService = {
       if (error.response) {
         errorMessage = error.response.data?.message || `Server error: ${error.response.status}`;
         
-        // Specific error messages
         if (error.response.status === 400) {
           const validationDetails = error.response.data?.errors || [];
           if (validationDetails.length > 0) {
@@ -310,12 +301,10 @@ export const recipeService = {
       formData.append('userId', updateData.userId || '');
       formData.append('mediaType', updateData.mediaType || 'none');
 
-      // Add video duration if video
       if (updateData.videoDuration && (updateData.mediaType === 'video' || mediaType === 'video')) {
         formData.append('videoDuration', updateData.videoDuration.toString());
       }
 
-      // Handle new media
       if (mediaFile instanceof File) {
         if (mediaType === 'video' || mediaFile.type.startsWith('video/')) {
           console.log('Adding new video to update');
@@ -325,7 +314,6 @@ export const recipeService = {
           formData.append('image', mediaFile);
         }
       } else {
-        // Keep existing media
         if (updateData.image) {
           console.log('Keeping existing image');
           formData.append('existingImage', updateData.image);
@@ -383,11 +371,9 @@ export const recipeService = {
       console.log('Deleting recipe from server:', recipeId);
       console.log('Post data:', postData);
       
-      // If it's a group post, use groupService
       if (postData && postData.groupId) {
         console.log('Deleting group post via groupService...');
         
-        // Assuming groupService is available (needs to be imported)
         const { groupService } = await import('./groupService');
         
         const result = await groupService.deleteGroupPost(
@@ -604,7 +590,6 @@ getSavedRecipes: async () => {
   }
 },
   
-  // Media file validation
   validateMediaFile: (file) => {
     if (!file) return { valid: false, message: 'No file selected' };
     
@@ -619,8 +604,8 @@ getSavedRecipes: async () => {
       };
     }
     
-    const maxImageSize = 10 * 1024 * 1024; // 10MB for images
-    const maxVideoSize = 100 * 1024 * 1024; // 100MB for videos
+    const maxImageSize = 10 * 1024 * 1024; 
+    const maxVideoSize = 100 * 1024 * 1024; 
     
     const isVideo = allowedVideoTypes.includes(file.type);
     const maxSize = isVideo ? maxVideoSize : maxImageSize;
@@ -640,7 +625,6 @@ getSavedRecipes: async () => {
     };
   },
 
-  // Create preview for image/video
   createMediaPreview: (file) => {
     return new Promise((resolve) => {
       if (!file) {
@@ -661,7 +645,6 @@ getSavedRecipes: async () => {
     });
   },
 
-  // Format file size
   formatFileSize: (bytes) => {
     if (bytes === 0) return '0 Bytes';
     
@@ -672,7 +655,6 @@ getSavedRecipes: async () => {
     return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
   },
 
-  // Image compression (optional)
   compressImage: (file, maxWidth = 1920, quality = 0.8) => {
     return new Promise((resolve) => {
       const canvas = document.createElement('canvas');
@@ -696,7 +678,6 @@ getSavedRecipes: async () => {
     });
   },
 
-  // Get trending recipes (top 3 most liked)
   getTrendingRecipes: async () => {
     try {
       const response = await api.get('/recipes/trending/top');

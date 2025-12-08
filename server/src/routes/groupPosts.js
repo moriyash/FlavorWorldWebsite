@@ -9,7 +9,6 @@ import User from '../models/User.js';
 
 const router = express.Router();
 
-// CREATE GROUP POST
 router.post('/:groupId/posts', upload.any(), async (req, res) => {
   try {
     console.log('=== Group Post Creation Debug ===');
@@ -97,7 +96,6 @@ router.post('/:groupId/posts', upload.any(), async (req, res) => {
       if (mediaFile) {
         isVideo = mediaFile.mimetype.startsWith('video/');
         
-        // Validate video size (max 100MB)
         if (isVideo && mediaFile.size > 100 * 1024 * 1024) {
           return res.status(400).json({ 
             message: 'Video file too large. Maximum size is 100MB.' 
@@ -147,9 +145,8 @@ router.post('/:groupId/posts', upload.any(), async (req, res) => {
 
     if (mediaData) {
       if (isVideo) {
-        // Check if base64 video exceeds MongoDB's 16MB limit
         const videoSizeInBytes = Buffer.byteLength(mediaData, 'utf8');
-        const maxMongoDocSize = 15 * 1024 * 1024; // 15MB to be safe (MongoDB limit is 16MB)
+        const maxMongoDocSize = 15 * 1024 * 1024; 
         
         if (videoSizeInBytes > maxMongoDocSize) {
           return res.status(400).json({ 
@@ -203,11 +200,11 @@ router.post('/:groupId/posts', upload.any(), async (req, res) => {
     });
     
   } catch (error) {
-    console.error('❌ Error creating group post:', error);
-    console.error('❌ Error name:', error.name);
-    console.error('❌ Error message:', error.message);
+    console.error(' Error creating group post:', error);
+    console.error(' Error name:', error.name);
+    console.error(' Error message:', error.message);
     if (error.errors) {
-      console.error('❌ Validation errors:', error.errors);
+      console.error(' Validation errors:', error.errors);
     }
     res.status(500).json({ 
       message: 'Failed to create group post',
@@ -217,7 +214,6 @@ router.post('/:groupId/posts', upload.any(), async (req, res) => {
   }
 });
 
-// GET GROUP POSTS
 router.get('/:groupId/posts', async (req, res) => {
   try {
     console.log('GET group posts request:', {
@@ -337,7 +333,6 @@ router.get('/:groupId/posts', async (req, res) => {
   }
 });
 
-// GET SINGLE GROUP POST
 router.get('/:groupId/posts/:postId', async (req, res) => {
   try {
     if (!isMongoConnected()) {
@@ -380,7 +375,6 @@ router.get('/:groupId/posts/:postId', async (req, res) => {
   }
 });
 
-// DELETE GROUP POST
 router.delete('/:groupId/posts/:postId', async (req, res) => {
   try {
     if (!isMongoConnected()) {
@@ -421,7 +415,6 @@ router.delete('/:groupId/posts/:postId', async (req, res) => {
   }
 });
 
-// LIKE GROUP POST
 router.post('/:groupId/posts/:postId/like', async (req, res) => {
   try {
     console.log('Liking group post...');
@@ -500,7 +493,6 @@ router.post('/:groupId/posts/:postId/like', async (req, res) => {
   }
 });
 
-// UNLIKE GROUP POST
 router.delete('/:groupId/posts/:postId/like', async (req, res) => {
   try {
     console.log('Unliking group post...');
@@ -559,7 +551,6 @@ router.delete('/:groupId/posts/:postId/like', async (req, res) => {
   }
 });
 
-// ADD COMMENT TO GROUP POST
 router.post('/:groupId/posts/:postId/comments', async (req, res) => {
   try {
     console.log('Adding comment to group post...');
@@ -718,7 +709,6 @@ router.put('/:groupId/posts/:postId', upload.any(), async (req, res) => {
       if (mediaFile) {
         isVideo = mediaFile.mimetype.startsWith('video/');
         
-        // Validate video size (max 100MB)
         if (isVideo && mediaFile.size > 100 * 1024 * 1024) {
           return res.status(400).json({ 
             message: 'Video file too large. Maximum size is 100MB.' 
@@ -731,12 +721,10 @@ router.put('/:groupId/posts/:postId', upload.any(), async (req, res) => {
       }
     }
 
-    // Handle media update
     if (mediaData) {
       if (isVideo) {
-        // Check if base64 video exceeds MongoDB's 16MB limit
         const videoSizeInBytes = Buffer.byteLength(mediaData, 'utf8');
-        const maxMongoDocSize = 15 * 1024 * 1024; // 15MB to be safe
+        const maxMongoDocSize = 15 * 1024 * 1024; 
         
         if (videoSizeInBytes > maxMongoDocSize) {
           return res.status(400).json({ 
@@ -746,14 +734,14 @@ router.put('/:groupId/posts/:postId', upload.any(), async (req, res) => {
         
         updateData.video = mediaData;
         updateData.mediaType = 'video';
-        updateData.image = null; // Clear image if video
+        updateData.image = null; 
         if (req.body.videoDuration) {
           updateData.videoDuration = parseInt(req.body.videoDuration);
         }
       } else {
         updateData.image = mediaData;
         updateData.mediaType = 'image';
-        updateData.video = null; // Clear video if image
+        updateData.video = null; 
       }
     } else if (req.body.image) {
       updateData.image = req.body.image;
@@ -774,7 +762,6 @@ router.put('/:groupId/posts/:postId', upload.any(), async (req, res) => {
         updateData.videoDuration = parseInt(req.body.videoDuration);
       }
     }
-    // If no media at all, keep the old one (don't update media fields)
 
     const updatedPost = await GroupPost.findByIdAndUpdate(
       postId,
@@ -806,7 +793,6 @@ router.put('/:groupId/posts/:postId', upload.any(), async (req, res) => {
   }
 });
 
-// DELETE COMMENT FROM GROUP POST
 router.delete('/:groupId/posts/:postId/comments/:commentId', async (req, res) => {
   try {
     console.log('Deleting comment from group post...');

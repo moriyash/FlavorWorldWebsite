@@ -1,4 +1,3 @@
-// server/src/routes/test.js
 import express from 'express';
 import { clearTestDB, isMongoConnected } from '../config/database.js';
 

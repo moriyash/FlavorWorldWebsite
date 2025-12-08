@@ -34,7 +34,6 @@ const FollowersScreen = () => {
   const isOwnProfile = !userId || userId === (currentUser?.id || currentUser?._id);
 
   const handleBackClick = () => {
-    // Navigate back to the profile page
     if (userId) {
       navigate(`/profile?userId=${userId}`);
     } else {

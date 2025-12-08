@@ -104,7 +104,6 @@ router.get('/my', async (req, res) => {
   }
 });
 
-// GET CHAT MESSAGES
 router.get('/:chatId/messages', async (req, res) => {
   try {
     if (!isMongoConnected()) {
@@ -137,7 +136,6 @@ router.get('/:chatId/messages', async (req, res) => {
   }
 });
 
-// SEND MESSAGE
 router.post('/:chatId/messages', async (req, res) => {
   try {
     if (!isMongoConnected()) {
@@ -205,7 +203,6 @@ router.post('/:chatId/messages', async (req, res) => {
   }
 });
 
-// MARK AS READ
 router.put('/:chatId/read', async (req, res) => {
   try {
     if (!isMongoConnected()) {
@@ -249,7 +246,6 @@ router.put('/:chatId/read', async (req, res) => {
   }
 });
 
-// GET UNREAD COUNT
 router.get('/unread-count', async (req, res) => {
   try {
     if (!isMongoConnected()) {

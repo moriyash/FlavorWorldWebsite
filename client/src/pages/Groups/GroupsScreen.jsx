@@ -27,7 +27,7 @@ const GroupsScreen = () => {
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
-  const [activeTab, setActiveTab] = useState('myGroups'); // 'myGroups' or 'discover'
+  const [activeTab, setActiveTab] = useState('myGroups'); 
 
   useEffect(() => {
     loadGroups();
@@ -59,11 +59,9 @@ const GroupsScreen = () => {
         setGroups(discoverGroups);
       } else {
         console.error('Failed to load groups:', result.message);
-        // Don't show alert for network/timeout errors
       }
     } catch (error) {
       console.error('Load groups error:', error);
-      // Don't show alert for network/timeout errors
     } finally {
       setLoading(false);
       setRefreshing(false);

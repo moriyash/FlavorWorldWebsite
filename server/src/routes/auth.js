@@ -1,4 +1,3 @@
-// server/src/routes/auth.js
 import express from 'express';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
@@ -192,17 +191,14 @@ router.post('/send-reset-code', async (req, res) => {
       return res.status(404).json({ message: 'No user found with this email address' });
     }
 
-    // Generate 6-digit code
     const code = Math.floor(100000 + Math.random() * 900000).toString();
     
-    // Generate reset token
     const resetToken = crypto.randomBytes(32).toString('hex');
     
-    // Store code with expiration (15 minutes to match email text)
     resetCodes.set(email.toLowerCase(), {
       code,
       resetToken,
-      expiresAt: Date.now() + 15 * 60 * 1000, // 15 minutes
+      expiresAt: Date.now() + 15 * 60 * 1000, 
       attempts: 0
     });
 
@@ -267,7 +263,6 @@ router.post('/verify-reset-code', async (req, res) => {
       });
     }
 
-    // Code is correct - generate verification token
     const verificationToken = crypto.randomBytes(32).toString('hex');
     resetData.verificationToken = verificationToken;
     resetData.verified = true;
@@ -283,7 +278,6 @@ router.post('/verify-reset-code', async (req, res) => {
   }
 });
 
-// Reset Password with Code
 router.post('/reset-password', async (req, res) => {
   try {
     const { email, code, newPassword, verificationToken } = req.body;
@@ -298,7 +292,6 @@ router.post('/reset-password', async (req, res) => {
       return res.status(400).json({ message: 'Invalid or expired reset session' });
     }
 
-    // Verify token and code
     if (!resetData.verified || resetData.verificationToken !== verificationToken) {
       return res.status(400).json({ message: 'Invalid verification. Please verify your code again.' });
     }
@@ -307,25 +300,21 @@ router.post('/reset-password', async (req, res) => {
       return res.status(400).json({ message: 'Invalid code' });
     }
 
-    // Check password strength
     if (newPassword.length < 8) {
       return res.status(400).json({ message: 'Password must be at least 8 characters long' });
     }
 
-    // Find user and update password
     const user = await User.findOne({ email: email.toLowerCase().trim() });
     if (!user) {
       return res.status(404).json({ message: 'User not found' });
     }
 
-    // Hash new password
     const saltRounds = 12;
     const hashedPassword = await bcrypt.hash(newPassword, saltRounds);
     
     user.password = hashedPassword;
     await user.save();
 
-    // Clear reset code
     resetCodes.delete(email.toLowerCase());
 
     console.log(`Password reset successful for: ${email}`);
@@ -340,7 +329,6 @@ router.post('/reset-password', async (req, res) => {
   }
 });
 
-// CHANGE PASSWORD - add to auth.js
 router.put('/change-password', async (req, res) => {
   try {
     console.log('=== Change Password via Auth Route ===');
@@ -365,7 +353,6 @@ router.put('/change-password', async (req, res) => {
 
     console.log('User found:', user.email);
 
-    // Use comparePassword method
     const isCurrentPasswordValid = await user.comparePassword(currentPassword);
 
     if (!isCurrentPasswordValid) {
@@ -376,7 +363,6 @@ router.put('/change-password', async (req, res) => {
       });
     }
 
-    // Validate new password strength
     const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^\da-zA-Z]).{8,}$/;
     if (!passwordRegex.test(newPassword)) {
       return res.status(400).json({ 

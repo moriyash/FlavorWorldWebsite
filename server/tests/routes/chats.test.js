@@ -9,7 +9,6 @@ import User from '../../src/models/User.js';
 import * as database from '../../src/config/database.js';
 import chatsRouter from '../../src/routes/chats.js';
 
-// Setup Express app for testing
 const testApp = express();
 testApp.use(express.json());
 testApp.use('/api/chats', chatsRouter);
@@ -18,7 +17,6 @@ describe('Chats Routes - Unit Tests', () => {
   let user1, user2, user3;
   let chat1;
 
-  // Helper function to create test users
   const createTestUser = async (name, email) => {
     return await User.create({
       fullName: name,
@@ -29,7 +27,6 @@ describe('Chats Routes - Unit Tests', () => {
     });
   };
 
-  // Helper function to create test chat
   const createTestChat = async (userId1, userId2, user1Data, user2Data) => {
     return await PrivateChat.create({
       participants: [
@@ -52,12 +49,10 @@ describe('Chats Routes - Unit Tests', () => {
   };
 
   beforeEach(async () => {
-    // Create test users
     user1 = await createTestUser('Alice Johnson', 'alice@test.com');
     user2 = await createTestUser('Bob Smith', 'bob@test.com');
     user3 = await createTestUser('Charlie Brown', 'charlie@test.com');
 
-    // Create a test chat between user1 and user2
     chat1 = await createTestChat(
       user1._id.toString(),
       user2._id.toString(),
@@ -66,7 +61,6 @@ describe('Chats Routes - Unit Tests', () => {
     );
   });
 
-  // POST /private - Create/Get Private Chat
   describe('POST /private - Create/Get Private Chat', () => {
     it('should create a new private chat between two users', async () => {
       const response = await request(app)
@@ -80,7 +74,6 @@ describe('Chats Routes - Unit Tests', () => {
       expect(response.body.participants[0].userId).toBe(user1._id.toString());
       expect(response.body.participants[1].userId).toBe(user3._id.toString());
       
-      // Verify unreadCount is initialized
       expect(response.body.unreadCount).toBeDefined();
     });
 
@@ -93,7 +86,6 @@ describe('Chats Routes - Unit Tests', () => {
       expect(response.status).toBe(200);
       expect(response.body._id.toString()).toBe(chat1._id.toString());
       
-      // Verify only one chat exists
       const chatsCount = await PrivateChat.countDocuments({
         'participants.userId': { $all: [user1._id.toString(), user2._id.toString()] }
       });
@@ -151,12 +143,10 @@ describe('Chats Routes - Unit Tests', () => {
             .post('/api/chats/private')
             .send({ otherUserId: user2._id.toString() });
 
-        // Should fail without proper user ID
         expect(response.status).toBe(500);
     });
 
     it('should return 500 on database error', async () => {
-      // Mock PrivateChat.findOne to throw error
       vi.spyOn(PrivateChat, 'findOne').mockRejectedValue(new Error('DB Error'));
 
       const response = await request(app)
@@ -171,12 +161,10 @@ describe('Chats Routes - Unit Tests', () => {
     });
   });
 
-  // GET /my - Get My Chats
   describe('GET /my - Get My Chats', () => {
     let chat2;
 
     beforeEach(async () => {
-      // Create another chat for user1
       chat2 = await createTestChat(
         user1._id.toString(),
         user3._id.toString(),
@@ -184,7 +172,6 @@ describe('Chats Routes - Unit Tests', () => {
         user3
       );
 
-      // Set some unread messages
       chat1.unreadCount.set(user1._id.toString(), 3);
       chat2.unreadCount.set(user1._id.toString(), 5);
       await chat1.save();
@@ -225,7 +212,6 @@ describe('Chats Routes - Unit Tests', () => {
     });
 
     it('should sort chats by updatedAt descending', async () => {
-      // Update chat2 to be more recent
       chat2.updatedAt = new Date(Date.now() + 10000);
       await chat2.save();
 
@@ -262,12 +248,10 @@ describe('Chats Routes - Unit Tests', () => {
     });
   });
 
-  // GET /:chatId/messages - Get Chat Messages
   describe('GET /:chatId/messages - Get Chat Messages', () => {
     let messages;
 
     beforeEach(async () => {
-      // Create test messages
       messages = [];
       for (let i = 0; i < 10; i++) {
         const message = await Message.create({
@@ -295,7 +279,6 @@ describe('Chats Routes - Unit Tests', () => {
 
       expect(response.status).toBe(200);
       
-      // Messages should be ordered by createdAt ascending
       for (let i = 1; i < response.body.length; i++) {
         const prev = new Date(response.body[i - 1].createdAt);
         const curr = new Date(response.body[i].createdAt);
@@ -326,7 +309,6 @@ describe('Chats Routes - Unit Tests', () => {
         .get(`/api/chats/${chat1._id}/messages`);
 
       expect(response.status).toBe(200);
-      // Default limit is 50, we have 10 messages
       expect(response.body).toHaveLength(10);
     });
 
@@ -386,7 +368,6 @@ describe('Chats Routes - Unit Tests', () => {
     });
   });
 
-  // POST /:chatId/messages - Send Message
   describe('POST /:chatId/messages - Send Message', () => {
     it('should send a message successfully', async () => {
       const response = await request(app)
@@ -539,10 +520,8 @@ describe('Chats Routes - Unit Tests', () => {
     });
   });
 
-  // PUT /:chatId/read - Mark as Read
   describe('PUT /:chatId/read - Mark as Read', () => {
     beforeEach(async () => {
-      // Create some unread messages
       await Message.create({
         chatId: chat1._id.toString(),
         senderId: user2._id.toString(),
@@ -559,7 +538,6 @@ describe('Chats Routes - Unit Tests', () => {
         readBy: [{ userId: user2._id.toString() }]
       });
 
-      // Set unread count
       chat1.unreadCount.set(user1._id.toString(), 2);
       await chat1.save();
     });
@@ -572,7 +550,6 @@ describe('Chats Routes - Unit Tests', () => {
       expect(response.status).toBe(200);
       expect(response.body.message).toBe('Messages marked as read');
 
-      // Verify messages are marked as read
       const messages = await Message.find({
         chatId: chat1._id.toString(),
         'readBy.userId': user1._id.toString()
@@ -591,7 +568,6 @@ describe('Chats Routes - Unit Tests', () => {
     });
 
     it('should not mark sender messages as read', async () => {
-      // Create message sent by user1
       await Message.create({
         chatId: chat1._id.toString(),
         senderId: user1._id.toString(),
@@ -606,18 +582,15 @@ describe('Chats Routes - Unit Tests', () => {
 
       expect(response.status).toBe(200);
 
-      // Verify only messages from other users are updated
       const updatedMessages = await Message.find({
         chatId: chat1._id.toString(),
         senderId: user1._id.toString()
       });
       
-      // User1's own messages should already have their readBy
       expect(updatedMessages[0].readBy).toHaveLength(1);
     });
 
     it('should not add duplicate readBy entries', async () => {
-      // Mark as read twice
       await request(app)
         .put(`/api/chats/${chat1._id}/read`)
         .set('x-user-id', user1._id.toString());
@@ -631,7 +604,6 @@ describe('Chats Routes - Unit Tests', () => {
         senderId: user2._id.toString()
       });
 
-      // Each message should have user1 in readBy only once
       messages.forEach(msg => {
         const user1ReadEntries = msg.readBy.filter(
           r => r.userId === user1._id.toString()
@@ -687,12 +659,10 @@ describe('Chats Routes - Unit Tests', () => {
     });
   });
 
-  // GET /unread-count - Get Unread Count
   describe('GET /unread-count - Get Unread Count', () => {
     let chat2;
 
     beforeEach(async () => {
-      // Create another chat for user1
       chat2 = await createTestChat(
         user1._id.toString(),
         user3._id.toString(),
@@ -700,7 +670,6 @@ describe('Chats Routes - Unit Tests', () => {
         user3
       );
 
-      // Set unread counts
       chat1.unreadCount.set(user1._id.toString(), 5);
       chat2.unreadCount.set(user1._id.toString(), 3);
       await chat1.save();
@@ -713,7 +682,7 @@ describe('Chats Routes - Unit Tests', () => {
         .set('x-user-id', user1._id.toString());
 
       expect(response.status).toBe(200);
-      expect(response.body.count).toBe(8); // 5 + 3
+      expect(response.body.count).toBe(8); 
     });
 
     it('should return 0 when user has no unread messages', async () => {
@@ -728,7 +697,6 @@ describe('Chats Routes - Unit Tests', () => {
     });
 
     it('should handle chats with undefined unread count', async () => {
-      // Create chat without explicit unreadCount
       const chat3 = await PrivateChat.create({
         participants: [
           { userId: user1._id.toString(), userName: user1.fullName },
@@ -779,10 +747,8 @@ describe('Chats Routes - Unit Tests', () => {
     });
   });
 
-  // Integration Tests - Complex Scenarios
   describe('Integration Scenarios', () => {
     it('should handle complete chat flow: create, send, read', async () => {
-      // 1. Create chat
       const createResponse = await request(app)
         .post('/api/chats/private')
         .set('x-user-id', user1._id.toString())
@@ -791,7 +757,6 @@ describe('Chats Routes - Unit Tests', () => {
       expect(createResponse.status).toBe(200);
       const chatId = createResponse.body._id;
 
-      // 2. Send message
       const sendResponse = await request(app)
         .post(`/api/chats/${chatId}/messages`)
         .set('x-user-id', user1._id.toString())
@@ -799,24 +764,20 @@ describe('Chats Routes - Unit Tests', () => {
 
       expect(sendResponse.status).toBe(201);
 
-      // 3. Check unread count for user3
       let chat = await PrivateChat.findById(chatId);
       expect(chat.unreadCount.get(user3._id.toString())).toBe(1);
 
-      // 4. Mark as read
       const readResponse = await request(app)
         .put(`/api/chats/${chatId}/read`)
         .set('x-user-id', user3._id.toString());
 
       expect(readResponse.status).toBe(200);
 
-      // 5. Verify unread count is zero
       chat = await PrivateChat.findById(chatId);
       expect(chat.unreadCount.get(user3._id.toString())).toBe(0);
     });
 
     it('should handle multiple messages between users', async () => {
-      // Send 5 messages back and forth
       for (let i = 0; i < 5; i++) {
         const sender = i % 2 === 0 ? user1 : user2;
         await request(app)
@@ -825,7 +786,6 @@ describe('Chats Routes - Unit Tests', () => {
           .send({ content: `Message ${i}` });
       }
 
-      // Fetch messages
       const response = await request(app)
         .get(`/api/chats/${chat1._id}/messages`);
 
@@ -834,7 +794,6 @@ describe('Chats Routes - Unit Tests', () => {
     });
 
     it('should maintain separate unread counts per user', async () => {
-      // User1 sends 3 messages
       for (let i = 0; i < 3; i++) {
         await request(app)
           .post(`/api/chats/${chat1._id}/messages`)
@@ -862,7 +821,6 @@ describe('Chats Routes - Unit Tests', () => {
     });
 
     it('should handle concurrent message sending', async () => {
-      // Send 3 messages simultaneously
       const promises = [1, 2, 3].map(i =>
         request(app)
           .post(`/api/chats/${chat1._id}/messages`)
@@ -875,13 +833,11 @@ describe('Chats Routes - Unit Tests', () => {
         expect(res.status).toBe(201);
       });
 
-      // Verify all messages were saved
       const messages = await Message.find({ chatId: chat1._id.toString() });
       expect(messages.length).toBeGreaterThanOrEqual(3);
     });
 
     it('should handle pagination across multiple pages', async () => {
-      // Create 25 messages
       for (let i = 0; i < 25; i++) {
         await Message.create({
           chatId: chat1._id.toString(),
@@ -891,21 +847,18 @@ describe('Chats Routes - Unit Tests', () => {
         });
       }
 
-      // Get page 1
       const page1 = await request(app)
         .get(`/api/chats/${chat1._id}/messages`)
         .query({ page: 1, limit: 10 });
 
       expect(page1.body).toHaveLength(10);
 
-      // Get page 2
       const page2 = await request(app)
         .get(`/api/chats/${chat1._id}/messages`)
         .query({ page: 2, limit: 10 });
 
       expect(page2.body).toHaveLength(10);
 
-      // Get page 3
       const page3 = await request(app)
         .get(`/api/chats/${chat1._id}/messages`)
         .query({ page: 3, limit: 10 });
@@ -914,7 +867,6 @@ describe('Chats Routes - Unit Tests', () => {
     });
   });
 
-  // Edge Cases and Error Handling
   describe('Edge Cases', () => {
     it('should handle very long message content', async () => {
       const longContent = 'a'.repeat(10000);
@@ -929,7 +881,7 @@ describe('Chats Routes - Unit Tests', () => {
     });
 
     it('should handle special characters in message content', async () => {
-      const specialContent = '🔥 Hello! @user #test $100 50% <script>alert("xss")</script>';
+      const specialContent = ' Hello! @user #test $100 50% <script>alert("xss")</script>';
 
       const response = await request(app)
         .post(`/api/chats/${chat1._id}/messages`)
@@ -958,24 +910,20 @@ describe('Chats Routes - Unit Tests', () => {
     });
 
     it('should handle chat with deleted user', async () => {
-      // Delete user2
       await User.findByIdAndDelete(user2._id);
 
       const response = await request(app)
         .get('/api/chats/my')
         .set('x-user-id', user1._id.toString());
 
-      // Should still return chats
       expect(response.status).toBe(200);
       expect(response.body.length).toBeGreaterThan(0);
     });
 
     it('should handle simultaneous read operations', async () => {
-      // Set unread count
       chat1.unreadCount.set(user1._id.toString(), 5);
       await chat1.save();
 
-      // Mark as read twice simultaneously
       const promises = [1, 2].map(() =>
         request(app)
           .put(`/api/chats/${chat1._id}/read`)
@@ -987,7 +935,6 @@ describe('Chats Routes - Unit Tests', () => {
         expect(res.status).toBe(200);
       });
 
-      // Verify unread count is still zero
       const chat = await PrivateChat.findById(chat1._id);
       expect(chat.unreadCount.get(user1._id.toString())).toBe(0);
     });
@@ -1015,7 +962,6 @@ describe('Chats Routes - Unit Tests', () => {
         .get(`/api/chats/${chat1._id}/messages`)
         .query({ page: 0, limit: 10 });
 
-      // Page 0 should be treated as page 1 (skip = -10, but MongoDB handles this)
       expect(response.status).toBe(200);
     });
 
@@ -1024,15 +970,12 @@ describe('Chats Routes - Unit Tests', () => {
         .get(`/api/chats/${chat1._id}/messages`)
         .query({ page: 1, limit: -10 });
 
-      // MongoDB should handle negative limit gracefully
       expect(response.status).toBe(200);
     });
   });
 
-  // Performance Tests
   describe('Performance Considerations', () => {
     it('should handle chat with many messages efficiently', async () => {
-      // Create 100 messages
       const messagePromises = [];
       for (let i = 0; i < 100; i++) {
         messagePromises.push(
@@ -1054,11 +997,10 @@ describe('Chats Routes - Unit Tests', () => {
 
       expect(response.status).toBe(200);
       expect(response.body).toHaveLength(50);
-      expect(endTime - startTime).toBeLessThan(1000); // Should complete within 1 second
+      expect(endTime - startTime).toBeLessThan(1000); 
     });
 
     it('should handle user with many chats', async () => {
-      // Create 20 chats for user1
       const chatPromises = [];
       for (let i = 0; i < 20; i++) {
         const tempUser = await User.create({
@@ -1086,10 +1028,9 @@ describe('Chats Routes - Unit Tests', () => {
 
       expect(response.status).toBe(200);
       expect(response.body.length).toBeGreaterThanOrEqual(20);
-      expect(endTime - startTime).toBeLessThan(2000); // Should complete within 2 seconds
+      expect(endTime - startTime).toBeLessThan(2000); 
     });
   });
 });
 
-// Export for use in other test files
 export { createTestUser, createTestChat };

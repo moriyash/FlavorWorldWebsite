@@ -142,7 +142,6 @@ export default function RegisterScreen() {
       if (result.success) {
         console.log('Registration successful');
         alert('Welcome to FlavorWorld! Registration completed successfully!');
-        // Navigate to login or home
         if (navigate) {
           navigate('/login');
         }

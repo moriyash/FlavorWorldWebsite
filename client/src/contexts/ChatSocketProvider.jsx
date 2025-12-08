@@ -1,4 +1,3 @@
-// src/contexts/ChatSocketProvider.jsx
 import React, { createContext, useContext, useEffect, useRef } from 'react';
 import { chatService } from '../services/chatServices';
 import { useAuth } from '../services/AuthContext';

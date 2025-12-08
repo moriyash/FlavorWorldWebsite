@@ -68,7 +68,6 @@ class ChatService {
       
       console.log('Final currentUser ID:', this.currentUser);
       
-      //  Socket.io connection
       this.socket = io(SOCKET_SERVER_URL, {
         query: {
           userId: this.currentUser
@@ -79,7 +78,6 @@ class ChatService {
         reconnectionDelay: 1000,
       });
 
-      // Socket connection events
       this.socket.on('connect', () => {
         console.log(' Socket connected');
         this.isConnected = true;
@@ -99,7 +97,6 @@ class ChatService {
         this.messageListeners.forEach(callback => callback(message));
       });
 
-      // Private chat events
       this.socket.on('messages_loaded', (messagesData) => {
         console.log(' Messages loaded:', messagesData.length);
       });
@@ -109,7 +106,6 @@ class ChatService {
         this.messageListeners.forEach(callback => callback(sentMessage));
       });
 
-      // Group chat events
       this.socket.on('group_messages_loaded', (messagesData) => {
         console.log(' Group messages loaded:', messagesData.length);
       });
@@ -133,7 +129,6 @@ class ChatService {
         this.typingListeners.forEach(callback => callback({ ...data, type: 'stop' }));
       });
 
-      // Group typing events
       this.socket.on('group_typing_started', (data) => {
         console.log(' Group user started typing:', data);
         this.typingListeners.forEach(callback => callback({ ...data, type: 'start' }));
@@ -302,11 +297,10 @@ class ChatService {
       console.log(` Sending ${chatType} message:`, messageData);
       console.log('Content length:', content.length);
       
-      // Set a timeout in case the server doesn't respond
       const timeout = setTimeout(() => {
         console.error(' Message send timeout');
         resolve({ success: false, message: 'Request timeout' });
-      }, 10000); // 10 second timeout
+      }, 10000); 
       
       this.socket.emit(event, messageData, (response) => {
         clearTimeout(timeout);
@@ -819,7 +813,6 @@ class ChatService {
 
       let allChats = [];
 
-      // Fetch private chats
       try {
         const privateResponse = await apiClient.get('/chats/my', config);
         const privateChats = (privateResponse.data || []).map(chat => ({
@@ -835,7 +828,6 @@ class ChatService {
         console.warn('Failed to load private chats:', error.message);
       }
 
-      // Fetch group chats
       try {
         const groupResponse = await apiClient.get('/group-chats/my', config);
         const groupChats = (groupResponse.data || []).map(chat => ({
@@ -851,7 +843,6 @@ class ChatService {
         console.warn('Failed to load group chats:', error.message);
       }
 
-      // Sort by last update
       allChats.sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt));
 
       console.log(`All chats fetched: ${allChats.length} total`);
@@ -1100,7 +1091,6 @@ class ChatService {
     }
   }
 
-  // Utility methods
   formatMessageTime(dateString) {
     const date = new Date(dateString);
     const now = new Date();

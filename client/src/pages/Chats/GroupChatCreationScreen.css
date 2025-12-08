@@ -1,5 +1,3 @@
-/* GroupChatCreationScreen.css */
-
 .group-creation-screen {
   min-height: 100vh;
   background: linear-gradient(135deg, #FFF8F0 0%, #F7F0E6 100%);
@@ -107,7 +105,6 @@
   to { transform: rotate(360deg); }
 }
 
-/* Group Info Section */
 .group-info-section {
   background: var(--white);
   padding: 24px 20px;
@@ -158,7 +155,6 @@
   resize: none;
 }
 
-/* Selected Users */
 .selected-users-section {
   background: var(--white);
   padding: 20px;
@@ -230,7 +226,6 @@
   transform: scale(1.1);
 }
 
-/* Users Section */
 .users-section {
   flex: 1;
   background: var(--white);

@@ -1,4 +1,3 @@
-// client/tests/e2e/specs/auth/register.spec.js
 import { test, expect } from '@playwright/test';
 import { 
   setupE2ETest, 
@@ -23,9 +22,8 @@ test.describe('User Registration E2E Tests', () => {
     await page.waitForLoadState('networkidle');
   });
 
-  // ============================================
-  // ✅ HAPPY PATH - Registration Flow
-  // ============================================
+  
+  //  HAPPY PATH - Registration Flow
 
   test('should display register page with all elements', async ({ page }) => {
     // Title with FlavorWorld
@@ -38,7 +36,7 @@ test.describe('User Registration E2E Tests', () => {
     await expect(page.locator(auth.register.passwordInput)).toBeVisible();
     await expect(page.locator(auth.register.confirmPasswordInput)).toBeVisible();
     
-    // Submit button visible (NOT disabled - as per your code)
+    // Submit button visible 
     await expect(page.locator(auth.register.submitButton)).toBeVisible();
     await expect(page.locator(auth.register.submitButton)).toBeEnabled();
     
@@ -49,9 +47,8 @@ test.describe('User Registration E2E Tests', () => {
   test('should successfully register a new user', async ({ page }) => {
     const user = generateTestUser('success');
     
-    console.log('📝 Registering user:', user.email);
+    console.log(' Registering user:', user.email);
     
-    // Setup alert handler BEFORE any action that triggers it
     let alertShown = false;
     page.on('dialog', async dialog => {
       console.log('Alert:', dialog.message());
@@ -89,10 +86,10 @@ test.describe('User Registration E2E Tests', () => {
     // Fill password
     await passwordInput.fill('Test1234!');
     
-    // Check initial state (hidden)
+    // Check initial state 
     await expect(passwordInput).toHaveAttribute('type', 'password');
     
-    // Click toggle (first one is for password field)
+    // Click toggle 
     await page.locator(auth.register.togglePasswordBtn).first().click();
     await page.waitForTimeout(100);
     
@@ -114,9 +111,7 @@ test.describe('User Registration E2E Tests', () => {
     await expect(page.locator(auth.login.pageTitle)).toBeVisible();
   });
 
-  // ============================================
-  // ❌ VALIDATION - Empty Fields
-  // ============================================
+  //  VALIDATION - Empty Fields
 
   test('should show alert when submitting empty form', async ({ page }) => {
     let alertMessage = '';
@@ -133,14 +128,11 @@ test.describe('User Registration E2E Tests', () => {
   });
 
   test('should show error for short name (less than 3 chars)', async ({ page }) => {
-    // Type short name
     await page.locator(auth.register.fullNameInput).fill('Ab');
     
-    // Trigger validation by moving to next field
     await page.locator(auth.register.emailInput).click();
     await page.waitForTimeout(300);
     
-    // Check if error appears (your code clears it on input, so this is optional)
     const errors = page.locator(auth.register.errorText);
     const errorCount = await errors.count();
     
@@ -164,7 +156,6 @@ test.describe('User Registration E2E Tests', () => {
   });
 
   test('should show error for weak password', async ({ page }) => {
-    // Password without special char
     await page.locator(auth.register.passwordInput).fill('Test1234');
     await page.locator(auth.register.confirmPasswordInput).click();
     await page.waitForTimeout(300);
@@ -194,12 +185,9 @@ test.describe('User Registration E2E Tests', () => {
     }
   });
 
-  // ============================================
-  // 🔐 EXISTING USER
-  // ============================================
+  //  EXISTING USER
 
   test('should reject registration with existing email', async ({ page }) => {
-    // Create a fixed email (not random) for this test
     const fixedEmail = `existing-test-${Date.now()}@test.com`;
     const existingUser = {
       fullName: 'Existing User',
@@ -208,7 +196,6 @@ test.describe('User Registration E2E Tests', () => {
       confirmPassword: 'Test1234!'
     };
     
-    // Register first user via API
     console.log('Creating first user with email:', fixedEmail);
     const registerResult = await authAPI.register(existingUser);
     console.log('First registration result:', registerResult);
@@ -222,7 +209,7 @@ test.describe('User Registration E2E Tests', () => {
     let alertMessage = '';
     page.on('dialog', async dialog => {
       alertMessage = dialog.message();
-      console.log('🔔 Alert received:', alertMessage);
+      console.log(' Alert received:', alertMessage);
       await dialog.accept();
     });
     
@@ -245,13 +232,10 @@ test.describe('User Registration E2E Tests', () => {
     
     expect(hasError).toBe(true);
     
-    // Should still be on register page (not navigated to login)
     expect(page.url()).toContain('register');
   });
 
-  // ============================================
-  // 🎯 EDGE CASES
-  // ============================================
+  //  EDGE CASES
 
   test('should trim whitespace from name and email', async ({ page }) => {
     const user = generateTestUser('whitespace');
@@ -277,10 +261,9 @@ test.describe('User Registration E2E Tests', () => {
   test('should show loading state during registration', async ({ page }) => {
     const user = generateTestUser('loading');
     
-    // Don't auto-accept dialog - we want to see loading
     let dialogHandled = false;
     page.on('dialog', async dialog => {
-      await page.waitForTimeout(500); // Give time to see loading
+      await page.waitForTimeout(500); 
       dialogHandled = true;
       await dialog.accept();
     });
@@ -292,16 +275,12 @@ test.describe('User Registration E2E Tests', () => {
     
     const submitBtn = page.locator(auth.register.submitButton);
     
-    // Click and check for loading - it might be too fast
     await submitBtn.click();
     
-    // Loading state is very fast, so we just verify the flow works
-    // Instead of checking for "Loading" text, verify button becomes disabled
     try {
       await expect(submitBtn).toBeDisabled({ timeout: 500 });
-      console.log('✅ Button was disabled during loading');
+      console.log(' Button was disabled during loading');
     } catch {
-      // Loading was too fast, that's okay - just verify dialog appeared
       await page.waitForTimeout(1000);
       expect(dialogHandled).toBe(true);
     }
@@ -328,9 +307,7 @@ test.describe('User Registration E2E Tests', () => {
     expect(result.data.user.fullName).toBe(specialName);
   });
 
-  // ============================================
-  // ♿ ACCESSIBILITY
-  // ============================================
+  //  ACCESSIBILITY
 
   test('should have form labels', async ({ page }) => {
     await expect(page.locator('label:has-text("Full Name")')).toBeVisible();
@@ -348,7 +325,6 @@ test.describe('User Registration E2E Tests', () => {
       await dialog.accept();
     });
     
-    // Focus first field and use keyboard
     await page.locator(auth.register.fullNameInput).click();
     await page.keyboard.type(user.fullName);
     
@@ -361,31 +337,24 @@ test.describe('User Registration E2E Tests', () => {
     await page.keyboard.press('Tab');
     await page.keyboard.type(user.password);
     
-    // Tab to button and press Enter (or just click it)
-    await page.keyboard.press('Tab'); // Should focus on submit button
+    await page.keyboard.press('Tab'); 
     await page.waitForTimeout(200);
     
-    // Use Enter or Space to activate button
     await page.keyboard.press('Enter');
     
-    // If Enter doesn't work on button, click it directly
     await page.waitForTimeout(500);
     if (!dialogShown) {
       await page.locator(auth.register.submitButton).click();
     }
     
-    // Wait for navigation or verify dialog shown
     try {
       await page.waitForURL('**/login', { timeout: 10000 });
     } catch {
-      // If navigation failed, at least verify dialog was shown
       expect(dialogShown).toBe(true);
     }
   });
 
-  // ============================================
-  // 📱 RESPONSIVE
-  // ============================================
+  //  RESPONSIVE
 
   test('should work on mobile viewport', async ({ page }) => {
     await page.setViewportSize({ width: 375, height: 667 });

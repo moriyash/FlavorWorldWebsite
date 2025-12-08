@@ -140,7 +140,6 @@ export const followService = {
     try {
       console.log('Removing follower:', followerId, 'from user:', userId);
       
-      // This uses the unfollow endpoint from the follower's side
       const response = await api.delete(`/users/${userId}/follow`, {
         data: { followerId }
       });

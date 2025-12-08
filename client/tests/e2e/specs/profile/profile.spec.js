@@ -20,7 +20,6 @@ test.describe('Profile Tests', () => {
   });
 
   test.beforeEach(async ({ request }) => {
-    // Create two test users
     testUser1 = generateTestUser('profile1');
     testUser2 = generateTestUser('profile2');
     
@@ -42,7 +41,6 @@ test.describe('Profile Tests', () => {
     await page.waitForURL('**/home', { timeout: 10000 });
     await page.waitForTimeout(2000);
     
-    // Navigate to profile using the top nav profile button
     await page.click('button.nav-icon-btn.profile-btn');
     await page.waitForURL('**/profile', { timeout: 10000 });
     await page.waitForTimeout(1000);
@@ -61,7 +59,6 @@ test.describe('Profile Tests', () => {
     await page.waitForURL('**/home', { timeout: 10000 });
     await page.waitForTimeout(2000);
     
-    // Click on the search box to navigate to search page
     await page.click('.search-box input[type="text"]');
     await page.waitForURL('**/search', { timeout: 10000 });
     await page.waitForTimeout(1000);
@@ -94,7 +91,6 @@ test.describe('Profile Tests', () => {
     await page.waitForURL('**/home', { timeout: 10000 });
     await page.waitForTimeout(2000);
     
-    // Click on the search box to navigate to search page
     await page.click('.search-box input[type="text"]');
     await page.waitForURL('**/search', { timeout: 10000 });
     await page.waitForTimeout(1000);
@@ -147,7 +143,6 @@ test.describe('Profile Tests', () => {
     await page.waitForURL('**/home', { timeout: 10000 });
     await page.waitForTimeout(2000);
     
-    // Navigate to profile using the top nav profile button
     await page.click('button.nav-icon-btn.profile-btn');
     await page.waitForURL('**/profile', { timeout: 10000 });
     await page.waitForTimeout(2000);
@@ -164,7 +159,6 @@ test.describe('Profile Tests', () => {
     await page.waitForURL('**/home', { timeout: 10000 });
     await page.waitForTimeout(2000);
     
-    // Click on the search box to navigate to search page
     await page.click('.search-box input[type="text"]');
     await page.waitForURL('**/search', { timeout: 10000 });
     await page.waitForTimeout(1000);
@@ -210,7 +204,6 @@ test.describe('Profile Tests', () => {
     await page.waitForURL('**/home', { timeout: 10000 });
     await page.waitForTimeout(2000);
     
-    // Navigate to profile using the top nav profile button
     await page.click('button.nav-icon-btn.profile-btn');
     await page.waitForURL('**/profile', { timeout: 10000 });
     await page.waitForTimeout(2000);

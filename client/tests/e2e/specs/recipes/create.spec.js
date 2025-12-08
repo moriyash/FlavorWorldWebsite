@@ -1,4 +1,3 @@
-// client/tests/e2e/specs/recipes/create.spec.js
 import { test, expect } from '@playwright/test';
 import { 
   setupE2ETest, 
@@ -58,18 +57,14 @@ test.describe('Create Recipe E2E Tests', () => {
     await page.waitForTimeout(1000);
   });
 
-  // ============================================
-  // ✅ POSITIVE TEST CASES
-  // ============================================
+  //  POSITIVE TEST CASES
 
   test('should display create recipe modal', async ({ page }) => {
   await openCreateRecipeModal(page);
   
-  // Check modal is visible
   await expect(page.locator('.modal-container')).toBeVisible();
   await expect(page.locator('h2:has-text("Share Recipe")')).toBeVisible();
   
-  // Check all form fields
   await expect(page.locator('input[placeholder="What\'s cooking?"]')).toBeVisible();
   await expect(page.locator('textarea[placeholder*="Tell us about"]')).toBeVisible();
   await expect(page.locator('textarea[placeholder*="ingredients"]')).toBeVisible();
@@ -97,10 +92,8 @@ test.describe('Create Recipe E2E Tests', () => {
     
     expect(alertMessage.toLowerCase()).toContain('success');
     
-    // Modal should close
     await expect(page.locator('.modal-container')).not.toBeVisible();
     
-    // Recipe should appear in feed
     const recipeInFeed = await waitForRecipeInFeed(page, recipeData.title, 5000);
     expect(recipeInFeed).toBe(true);
   });
@@ -118,14 +111,13 @@ test.describe('Create Recipe E2E Tests', () => {
     await submitRecipeForm(page);
     await page.waitForTimeout(2000);
     
-    // Check recipe appears in feed
     await expect(page.locator(`text=${recipeData.title}`)).toBeVisible({ timeout: 5000 });
   });
 
   test('should handle prep time with hours and minutes', async ({ page }) => {
     const recipeData = {
       ...generateTestRecipe('time-test'),
-      prepTime: 125 // 2 hours 5 minutes
+      prepTime: 125 
     };
     
     await openCreateRecipeModal(page);
@@ -146,7 +138,6 @@ test.describe('Create Recipe E2E Tests', () => {
     await page.waitForTimeout(300);
     await page.locator('.dropdown-item:has-text("Mixed")').click();
     
-    // Fill time: 2h 5m
     await page.locator('input.time-input').first().fill('2');
     await page.locator('input.time-input').last().fill('5');
     
@@ -231,9 +222,7 @@ test.describe('Create Recipe E2E Tests', () => {
     await expect(page.locator('.modal-container')).not.toBeVisible();
   });
 
-  // ============================================
-  // ❌ VALIDATION TEST CASES
-  // ============================================
+  //  VALIDATION TEST CASES
 
   test('should show alert for empty title', async ({ page }) => {
     const recipeData = generateTestRecipe('no-title');
@@ -322,9 +311,8 @@ test.describe('Create Recipe E2E Tests', () => {
     expect(alertMessage.toLowerCase()).toContain('fill in all');
   });
 
-  // ============================================
-  // 📱 RESPONSIVE
-  // ============================================
+  
+  //  RESPONSIVE
 
   test('should work on mobile viewport', async ({ page }) => {
     await page.setViewportSize({ width: 375, height: 667 });

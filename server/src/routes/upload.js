@@ -4,7 +4,6 @@ import { isMongoConnected } from '../config/database.js';
 
 const router = express.Router();
 
-// UPLOAD AVATAR
 router.post('/avatar', upload.single('avatar'), async (req, res) => {
   try {
     console.log('=== Avatar Upload Debug ===');

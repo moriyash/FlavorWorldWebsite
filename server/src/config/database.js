@@ -1,4 +1,3 @@
-// server/src/config/database.js
 import mongoose from 'mongoose';
 
 let isConnected = false;
@@ -32,7 +31,6 @@ const connectDB = async () => {
       return;
     }
 
-    // ✅ קרא ל-getMongoURI רק עכשיו, אחרי ש-dotenv נטען
     const MONGODB_URI = getMongoURI();
 
     if (!MONGODB_URI) {
@@ -42,22 +40,22 @@ const connectDB = async () => {
 
     await mongoose.connect(MONGODB_URI, {
       serverSelectionTimeoutMS: 5000,
-      socketTimeoutMS: 300000, // Increased to 300 seconds (5 minutes) for large media files
+      socketTimeoutMS: 300000, 
       maxPoolSize: 10,
       minPoolSize: 2,
     });
 
     isConnected = true;
-    console.log('✅ MongoDB Connected Successfully!');
-    console.log(`📦 Database: ${mongoose.connection.db.databaseName}`);
+    console.log(' MongoDB Connected Successfully!');
+    console.log(` Database: ${mongoose.connection.db.databaseName}`);
     
     if (process.env.TEST_MODE === 'e2e') {
-      console.log('🧪 E2E Test Mode - Using isolated test database');
+      console.log(' E2E Test Mode - Using isolated test database');
       console.log('Your production data is safe!');
     }
     
   } catch (err) {
-    console.error('❌ MongoDB Connection Error:', err.message);
+    console.error(' MongoDB Connection Error:', err.message);
     isConnected = false;
     
     if (process.env.TEST_MODE === 'e2e' || process.env.NODE_ENV === 'test') {
@@ -67,8 +65,6 @@ const connectDB = async () => {
 };
 
 const isMongoConnected = () => {
-  // Check actual mongoose connection state instead of flag
-  // This works in both production and test environments
   return mongoose.connection.readyState === 1;
 };
 
@@ -111,7 +107,6 @@ const disconnectDB = async () => {
   }
 };
 
-// Graceful shutdown
 process.on('SIGINT', async () => {
   console.log('Shutting down gracefully...');
   await disconnectDB();

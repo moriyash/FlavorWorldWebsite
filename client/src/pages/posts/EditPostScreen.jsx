@@ -29,7 +29,7 @@ const MEAT_TYPES = [
 const EditPostScreen = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const { id } = useParams(); // Try to get from URL params
+  const { id } = useParams(); 
   const { currentUser } = useAuth();
   
   const { 
@@ -54,7 +54,7 @@ const EditPostScreen = () => {
   const [imageFile, setImageFile] = useState(null);
   const [imagePreview, setImagePreview] = useState(null);
   const [originalImage, setOriginalImage] = useState(null);
-  const [mediaType, setMediaType] = useState('none'); // 'none', 'image', 'video'
+  const [mediaType, setMediaType] = useState('none'); 
   const [videoDuration, setVideoDuration] = useState(0);
   
   const [errors, setErrors] = useState({});
@@ -133,7 +133,6 @@ const EditPostScreen = () => {
       const isVideo = file.type.startsWith('video/');
       
       if (isVideo) {
-        // Validate video duration
         const video = document.createElement('video');
         video.preload = 'metadata';
         
@@ -146,7 +145,6 @@ const EditPostScreen = () => {
             return;
           }
           
-          // Check file size (max 10MB to stay under MongoDB limit after base64 encoding)
           const maxSizeInMB = 10;
           const fileSizeInMB = file.size / (1024 * 1024);
           

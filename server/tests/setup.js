@@ -1,4 +1,3 @@
-// server/tests/setup.js
 import { MongoMemoryServer } from 'mongodb-memory-server';
 import mongoose from 'mongoose';
 import { beforeAll, afterAll, afterEach, vi } from 'vitest';

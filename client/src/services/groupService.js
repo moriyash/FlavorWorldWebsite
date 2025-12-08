@@ -12,7 +12,6 @@ class GroupService {
       },
     });
 
-    // Add interceptor for token
     this.axiosInstance.interceptors.request.use(
       (config) => {
         const token = localStorage.getItem('userToken');
@@ -43,7 +42,6 @@ class GroupService {
       formData.append('requireApproval', groupData.requireApproval.toString());
       formData.append('allowInvites', groupData.allowInvites.toString());
 
-      // Handle image file for React (File object instead of URI)
       if (imageFile && imageFile instanceof File) {
         formData.append('image', imageFile);
       }
@@ -342,7 +340,6 @@ class GroupService {
       
       const formData = new FormData();
       
-      // Add all fields
       formData.append('title', updateData.title || '');
       formData.append('description', updateData.description || '');
       formData.append('ingredients', updateData.ingredients || '');
@@ -353,7 +350,6 @@ class GroupService {
       formData.append('servings', updateData.servings?.toString() || '1');
       formData.append('userId', updateData.userId);
 
-      // Add video duration if video
       if (updateData.videoDuration && (updateData.mediaType === 'video' || mediaType === 'video')) {
         formData.append('videoDuration', updateData.videoDuration.toString());
       }
@@ -369,7 +365,6 @@ class GroupService {
           formData.append('mediaType', 'image');
         }
       } else {
-        // Keep existing media
         if (updateData.image) {
           formData.append('image', updateData.image);
           formData.append('mediaType', 'image');
@@ -579,7 +574,6 @@ class GroupService {
       
       const formData = new FormData();
       
-      // Add all basic fields
       formData.append('title', postData.title);
       formData.append('description', postData.description || '');
       formData.append('ingredients', postData.ingredients || '');
@@ -603,7 +597,6 @@ class GroupService {
           formData.append('mediaType', 'image');
         }
       } else if (postData.image) {
-        // If image data already in base64
         console.log('Using existing image data');
         formData.append('image', postData.image);
         formData.append('mediaType', 'image');
@@ -619,12 +612,11 @@ class GroupService {
           headers: {
             'Content-Type': 'multipart/form-data',
           },
-          timeout: 120000, // 2 minutes for video uploads
+          timeout: 120000, 
           onUploadProgress: (progressEvent) => {
             const progress = Math.round((progressEvent.loaded * 100) / progressEvent.total);
             console.log(`Upload progress: ${progress}%`);
             
-            // Allow progress callback
             if (postData.onUploadProgress) {
               postData.onUploadProgress(progress);
             }
@@ -799,17 +791,15 @@ class GroupService {
     try {
       console.log('Fetching group with full member details');
       
-      // Use the standard group endpoint which includes enriched member data
       const response = await this.axiosInstance.get(`/groups/${groupId}`, {
         timeout: 15000
       });
 
       console.log('Group with members fetched successfully:', response.data);
       
-      // The endpoint returns the group data directly, not wrapped
       return {
         success: true,
-        data: response.data  // This is the enriched group object with members
+        data: response.data  
       };
       
     } catch (error) {
@@ -915,7 +905,7 @@ class GroupService {
       return { valid: false, message: 'Please select a valid image file (JPEG, PNG)' };
     }
     
-    const maxSize = 5 * 1024 * 1024; // 5MB
+    const maxSize = 5 * 1024 * 1024; 
     if (file.size > maxSize) {
       return { valid: false, message: 'Image size should be less than 5MB' };
     }

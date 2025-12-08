@@ -8,7 +8,6 @@ import { Server } from 'socket.io';
 
 const app = express();
 const server = http.createServer(app);
-// Socket.IO - only if not in test mode
 let io;
 if (process.env.NODE_ENV !== 'test') {
   io = new Server(server, {
@@ -27,7 +26,6 @@ if (process.env.NODE_ENV !== 'test') {
   console.log(' Socket.IO mocked for tests');
 }
 
-// Middleware
 const allowedOrigins = [
   'http://localhost:5173', 
   'http://localhost:3000', 
@@ -47,13 +45,11 @@ app.use((req, res, next) => {
 });app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ extended: true, limit: '50mb' }));
 
-// Make io available in routes
 app.use((req, res, next) => {
   req.io = io;
   next();
 });
 
-// Only log in non-test environments
 if (process.env.NODE_ENV !== 'test') {
   app.use((req, res, next) => {
     console.log(`${req.method} ${req.path} - Content-Type: ${req.headers['content-type']}`);
@@ -61,7 +57,6 @@ if (process.env.NODE_ENV !== 'test') {
   });
 }
 
-// Import routes
 import authRoutes from './routes/auth.js';
 import userRoutes from './routes/users.js';
 import recipeRoutes from './routes/recipes.js';
@@ -73,7 +68,6 @@ import notificationRoutes from './routes/notifications.js';
 import feedRoutes from './routes/feed.js';
 import uploadRoutes from './routes/upload.js';
 
-// Mount routes
 app.use('/api/auth', authRoutes);
 app.use('/api/user', userRoutes);
 app.use('/api/users', userRoutes);
@@ -87,14 +81,12 @@ app.use('/api/feed', feedRoutes);
 app.use('/api/following', feedRoutes);
 app.use('/api/upload', uploadRoutes);
 
-// Socket.IO handlers - only if not in test
 if (process.env.NODE_ENV !== 'test') {
   const { default: socketHandlers } = await import('./socket/socketHandlers.js');
   socketHandlers(io);
   console.log('Notifications activated for all user actions');
 }
 
-// Basic routes
 app.get('/', (req, res) => {
   res.send('Recipe Social Network API Server is running');
 });
@@ -109,7 +101,6 @@ app.get('/api/health', async (req, res) => {
   });
 });
 
-// Test endpoint - only in dev/test
 if (process.env.NODE_ENV !== 'production') {
   app.get('/api/test-delete', async (req, res) => {
     const { default: User } = await import('./models/User.js');
@@ -146,7 +137,6 @@ if (process.env.NODE_ENV !== 'production') {
   });
 }
 
-// Test endpoints
 if (process.env.TEST_MODE === 'e2e' || process.env.NODE_ENV === 'test') {
   (async () => {
     try {
@@ -159,7 +149,6 @@ if (process.env.TEST_MODE === 'e2e' || process.env.NODE_ENV === 'test') {
   })();
 }
 
-// Error handling
 app.use((error, req, res, next) => {
   console.error('Error:', error);
   res.status(500).json({

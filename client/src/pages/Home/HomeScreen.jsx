@@ -267,7 +267,6 @@ const HomeScreen = () => {
     }
   }, [currentUser?.id, currentUser?._id, loadUnreadChatCount]);
 
-  // Load posts when user or feedType changes
   useEffect(() => {
     const userId = currentUser?.id || currentUser?._id;
     if (userId) {
@@ -276,7 +275,6 @@ const HomeScreen = () => {
     }
   }, [currentUser?.id, currentUser?._id, feedType, loadPosts]);
 
-  // Initialize chat service once when user is available
   useEffect(() => {
     const userId = currentUser?.id || currentUser?._id;
     if (userId) {
@@ -351,7 +349,6 @@ const HomeScreen = () => {
 
   const handleShareSuccess = useCallback((shareData) => {
     console.log('Recipe shared successfully:', shareData);
-    // Optionally show a toast notification or update UI
   }, []);
 
   const handleSystemShare = useCallback(async (post) => {

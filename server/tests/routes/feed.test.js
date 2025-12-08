@@ -1,22 +1,17 @@
-// tests/routes/feed.test.js
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import request from 'supertest';
 import express from 'express';
 import mongoose from 'mongoose';
 
-// Import route
 import feedRouter from '../../src/routes/feed.js';
 
-// Import models
 import User from '../../src/models/User.js';
 import Recipe from '../../src/models/Recipe.js';
 import Group from '../../src/models/Group.js';
 import GroupPost from '../../src/models/GroupPost.js';
 
-// Import database
 import * as database from '../../src/config/database.js';
 
-// Create Express app for testing
 const app = express();
 app.use(express.json());
 app.use('/api/feed', feedRouter);
@@ -27,7 +22,6 @@ describe('Feed Routes - Unit Tests', () => {
   let recipe1, recipe2, recipe3;
   let groupPost1, groupPost2;
 
-  // Helper functions
   const createTestUser = async (overrides = {}) => {
     return await User.create({
       fullName: 'Test User',
@@ -95,7 +89,6 @@ describe('Feed Routes - Unit Tests', () => {
   };
 
   beforeEach(async () => {
-    // Create users
     user1 = await createTestUser({
       fullName: 'Alice Johnson',
       email: 'alice@test.com'
@@ -111,13 +104,11 @@ describe('Feed Routes - Unit Tests', () => {
       email: 'charlie@test.com'
     });
 
-    // Setup following relationships
     user1.following = [{ userId: user2._id.toString(), followedAt: new Date() }];
     user2.followers = [{ userId: user1._id.toString(), followedAt: new Date() }];
     await user1.save();
     await user2.save();
 
-    // Create groups
     group1 = await createTestGroup(user2._id, {
       name: 'Cooking Group',
       members: [
@@ -133,7 +124,6 @@ describe('Feed Routes - Unit Tests', () => {
       ]
     });
 
-    // Create recipes (personal posts)
     recipe1 = await createTestRecipe(user1._id, {
       title: 'Alice Recipe 1'
     });
@@ -146,7 +136,6 @@ describe('Feed Routes - Unit Tests', () => {
       title: 'Charlie Recipe 1'
     });
 
-    // Create group posts
     groupPost1 = await createTestGroupPost(group1._id, user2._id, {
       title: 'Group Post 1',
       isApproved: true
@@ -158,7 +147,6 @@ describe('Feed Routes - Unit Tests', () => {
     });
   });
 
-  // GET / - Personalized Feed
   describe('GET / - Personalized Feed', () => {
     it('should return personalized feed with following and group posts', async () => {
       const response = await request(app)
@@ -169,11 +157,9 @@ describe('Feed Routes - Unit Tests', () => {
       expect(Array.isArray(response.body)).toBe(true);
       expect(response.body.length).toBeGreaterThan(0);
 
-      // Should contain posts from following (Bob + Alice's own)
       const bobPost = response.body.find(p => p.title === 'Bob Recipe 1');
       expect(bobPost).toBeDefined();
 
-      // Should contain group posts
       const groupPost = response.body.find(p => p.title === 'Group Post 1');
       expect(groupPost).toBeDefined();
     });
@@ -189,7 +175,6 @@ describe('Feed Routes - Unit Tests', () => {
       expect(response.status).toBe(200);
       expect(Array.isArray(response.body)).toBe(true);
 
-      // Should only contain recipes, not group posts
       response.body.forEach(post => {
         expect(post).not.toHaveProperty('groupId');
       });
@@ -206,7 +191,6 @@ describe('Feed Routes - Unit Tests', () => {
       expect(response.status).toBe(200);
       expect(Array.isArray(response.body)).toBe(true);
 
-      // Should only contain group posts
       response.body.forEach(post => {
         expect(post.groupId).toBeDefined();
         expect(post.postSource).toBe('group');
@@ -233,7 +217,6 @@ describe('Feed Routes - Unit Tests', () => {
       
       if (response.body.length > 0) {
         const post = response.body[0];
-        // Only check userName - avatar and bio might not be returned
         expect(post.userName).toBeDefined();
       }
     });
@@ -282,7 +265,6 @@ describe('Feed Routes - Unit Tests', () => {
     });
 
     it('should use default limit of 50', async () => {
-      // Create many posts
       for (let i = 0; i < 60; i++) {
         await createTestRecipe(user2._id, {
           title: `Recipe ${i}`
@@ -301,7 +283,6 @@ describe('Feed Routes - Unit Tests', () => {
     });
 
     it('should return empty array when user not following anyone and not in groups', async () => {
-      // Create new user with no connections
       const newUser = await createTestUser({
         email: 'newuser@test.com'
       });
@@ -315,7 +296,6 @@ describe('Feed Routes - Unit Tests', () => {
     });
 
     it('should only show approved group posts', async () => {
-      // Create unapproved post
       await createTestGroupPost(group1._id, user2._id, {
         title: 'Unapproved Post',
         isApproved: false
@@ -335,7 +315,6 @@ describe('Feed Routes - Unit Tests', () => {
     });
 
     it('should not show posts from private groups user is not member of', async () => {
-      // Create private group
       const privateGroup = await createTestGroup(user3._id, {
         name: 'Private Group',
         isPrivate: true,
@@ -412,7 +391,6 @@ describe('Feed Routes - Unit Tests', () => {
     });
   });
 
-  // GET /stats - Feed Statistics
   describe('GET /stats - Feed Statistics', () => {
     it('should return feed stats successfully', async () => {
       const response = await request(app)
@@ -434,7 +412,7 @@ describe('Feed Routes - Unit Tests', () => {
         .query({ userId: user1._id.toString() });
 
       expect(response.status).toBe(200);
-      expect(response.body.followingCount).toBe(1); // user1 follows user2
+      expect(response.body.followingCount).toBe(1); 
     });
 
     it('should calculate groups count correctly', async () => {
@@ -443,7 +421,7 @@ describe('Feed Routes - Unit Tests', () => {
         .query({ userId: user1._id.toString() });
 
       expect(response.status).toBe(200);
-      expect(response.body.groupsCount).toBe(1); // user1 is in group1
+      expect(response.body.groupsCount).toBe(1); 
     });
 
     it('should calculate own posts count correctly', async () => {
@@ -452,7 +430,7 @@ describe('Feed Routes - Unit Tests', () => {
         .query({ userId: user1._id.toString() });
 
       expect(response.status).toBe(200);
-      expect(response.body.ownPostsCount).toBe(1); // recipe1
+      expect(response.body.ownPostsCount).toBe(1); 
     });
 
     it('should calculate total feed posts correctly', async () => {
@@ -522,7 +500,6 @@ describe('Feed Routes - Unit Tests', () => {
     });
   });
 
-  // GET /my-posts - User's Group Posts
   describe('GET /my-posts - User Group Posts', () => {
     it('should return user group posts successfully', async () => {
       const response = await request(app)
@@ -537,7 +514,6 @@ describe('Feed Routes - Unit Tests', () => {
     });
 
     it('should only return approved group posts', async () => {
-      // Create unapproved post
       await createTestGroupPost(group1._id, user1._id, {
         title: 'Unapproved Group Post',
         isApproved: false
@@ -582,7 +558,6 @@ describe('Feed Routes - Unit Tests', () => {
     });
 
     it('should sort posts by date descending', async () => {
-      // Create another post
       await createTestGroupPost(group1._id, user1._id, {
         title: 'Newer Group Post'
       });
@@ -624,7 +599,6 @@ describe('Feed Routes - Unit Tests', () => {
     });
   });
 
-  // GET /posts - Following Posts
   describe('GET /posts - Following Posts', () => {
     it('should return following posts successfully', async () => {
       const response = await request(app)
@@ -634,11 +608,9 @@ describe('Feed Routes - Unit Tests', () => {
       expect(response.status).toBe(200);
       expect(Array.isArray(response.body)).toBe(true);
       
-      // Should include Bob's post
       const bobPost = response.body.find(p => p.title === 'Bob Recipe 1');
       expect(bobPost).toBeDefined();
       
-      // Should include own post
       const ownPost = response.body.find(p => p.title === 'Alice Recipe 1');
       expect(ownPost).toBeDefined();
     });
@@ -652,14 +624,12 @@ describe('Feed Routes - Unit Tests', () => {
       
       if (response.body.length > 0) {
         const post = response.body[0];
-        // Only check userName - avatar might be null
         expect(post.userName).toBeDefined();
         expect(post.postSource).toBe('personal');
       }
     });
 
     it('should return empty array when not following anyone', async () => {
-      // Create user with no following
       const lonelyUser = await createTestUser({
         email: 'lonely@test.com',
         following: []
@@ -674,7 +644,6 @@ describe('Feed Routes - Unit Tests', () => {
     });
 
     it('should sort posts by date descending', async () => {
-      // Create more recipes
       await createTestRecipe(user2._id, { title: 'Bob Recipe 2' });
       await createTestRecipe(user1._id, { title: 'Alice Recipe 2' });
 
@@ -748,5 +717,4 @@ describe('Feed Routes - Unit Tests', () => {
   });
 });
 
-// Export helper functions
 export { createTestUser, createTestRecipe, createTestGroup, createTestGroupPost };

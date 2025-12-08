@@ -1,4 +1,3 @@
-// client/tests/e2e/specs/auth/forgotPassword.spec.js
 import { test, expect } from '@playwright/test';
 import { 
   setupE2ETest, 
@@ -20,7 +19,7 @@ test.describe('Forgot Password E2E Tests', () => {
     const result = await registerUser(testUser);
     expect(result.success).toBe(true);
     
-    console.log('✅ Test user created:', testUser.email);
+    console.log(' Test user created:', testUser.email);
   });
 
   test.afterAll(async () => {
@@ -32,9 +31,7 @@ test.describe('Forgot Password E2E Tests', () => {
     await page.waitForLoadState('networkidle');
   });
 
-  // ============================================
-  // ✅ UI & NAVIGATION TESTS
-  // ============================================
+  //  UI & NAVIGATION TESTS
 
   test('should display forgot password page correctly', async ({ page }) => {
     // Check title
@@ -52,7 +49,6 @@ test.describe('Forgot Password E2E Tests', () => {
   test('should have disabled button for empty email', async ({ page }) => {
     const continueButton = page.locator(auth.forgotPassword.continueButton);
     
-    // Button should be disabled when email is empty
     await expect(continueButton).toBeDisabled();
   });
 
@@ -61,7 +57,6 @@ test.describe('Forgot Password E2E Tests', () => {
     
     const continueButton = page.locator(auth.forgotPassword.continueButton);
     
-    // Button should remain disabled for invalid email
     await expect(continueButton).toBeDisabled();
   });
 
@@ -70,7 +65,6 @@ test.describe('Forgot Password E2E Tests', () => {
     
     const continueButton = page.locator(auth.forgotPassword.continueButton);
     
-    // Button should be enabled for valid email
     await expect(continueButton).toBeEnabled();
   });
 
@@ -79,7 +73,6 @@ test.describe('Forgot Password E2E Tests', () => {
     
     await page.waitForURL('**/login');
     
-    // Verify we're on login page
     await expect(page.locator(auth.login.pageTitle)).toBeVisible();
   });
 
@@ -90,7 +83,6 @@ test.describe('Forgot Password E2E Tests', () => {
     
     const continueButton = page.locator(auth.forgotPassword.continueButton);
     
-    // Should be enabled (whitespace trimmed)
     await expect(continueButton).toBeEnabled();
   });
 
@@ -101,7 +93,6 @@ test.describe('Forgot Password E2E Tests', () => {
     
     const continueButton = page.locator(auth.forgotPassword.continueButton);
     
-    // Should be enabled
     await expect(continueButton).toBeEnabled();
   });
 
@@ -109,49 +100,38 @@ test.describe('Forgot Password E2E Tests', () => {
     const continueButton = page.locator(auth.forgotPassword.continueButton);
     const emailInput = page.locator(auth.forgotPassword.emailInput);
     
-    // Start with invalid format
     await emailInput.fill('test');
     await expect(continueButton).toBeDisabled();
     
-    // Add @ sign
     await emailInput.fill('test@');
     await expect(continueButton).toBeDisabled();
     
-    // Complete to valid email
     await emailInput.fill('test@test.com');
     await expect(continueButton).toBeEnabled();
   });
 
-  // ============================================
-  // ♿ ACCESSIBILITY
-  // ============================================
+  //  ACCESSIBILITY
 
   test('should have proper form labels', async ({ page }) => {
     await expect(page.locator('label:has-text("Email address")')).toBeVisible();
   });
 
   test('should support keyboard navigation', async ({ page }) => {
-    // Focus email input
     await page.locator(auth.forgotPassword.emailInput).focus();
     await page.keyboard.type(testUser.email);
     
-    // Tab to continue button
     await page.keyboard.press('Tab');
     await page.waitForTimeout(100);
     
-    // Verify button is focused (can be activated)
     const continueButton = page.locator(auth.forgotPassword.continueButton);
     await expect(continueButton).toBeEnabled();
   });
 
-  // ============================================
-  // 📱 RESPONSIVE
-  // ============================================
+  //  RESPONSIVE
 
   test('should work on mobile viewport', async ({ page }) => {
     await page.setViewportSize({ width: 375, height: 667 });
     
-    // All elements should be visible
     await expect(page.locator(auth.forgotPassword.emailInput)).toBeVisible();
     await expect(page.locator(auth.forgotPassword.continueButton)).toBeVisible();
     await expect(page.locator(auth.forgotPassword.backToLoginButton)).toBeVisible();
@@ -160,25 +140,20 @@ test.describe('Forgot Password E2E Tests', () => {
   test('should work on tablet viewport', async ({ page }) => {
     await page.setViewportSize({ width: 768, height: 1024 });
     
-    // All elements should be visible
     await expect(page.locator(auth.forgotPassword.emailInput)).toBeVisible();
     await expect(page.locator(auth.forgotPassword.continueButton)).toBeVisible();
   });
 
-  // ============================================
-  // 🎯 EDGE CASES
-  // ============================================
+  //  EDGE CASES
 
   test('should handle very long email', async ({ page }) => {
     const longEmail = 'a'.repeat(100) + '@test.com';
     
     await page.locator(auth.forgotPassword.emailInput).fill(longEmail);
     
-    // Should still work (or show appropriate validation)
     const continueButton = page.locator(auth.forgotPassword.continueButton);
     const isEnabled = await continueButton.isEnabled();
     
-    // Either enabled (accepts long emails) or disabled (validates max length)
     expect(typeof isEnabled).toBe('boolean');
   });
 
@@ -189,20 +164,8 @@ test.describe('Forgot Password E2E Tests', () => {
     
     const continueButton = page.locator(auth.forgotPassword.continueButton);
     
-    // Should accept valid special characters
     await expect(continueButton).toBeEnabled();
   });
 
-  // ============================================
-  // 📝 NOTE: Email sending tests skipped
-  // ============================================
-  // These tests require actual email server setup:
-  // - should check if email exists
-  // - should send reset code
-  // - should handle unregistered email
-  // 
-  // These are better tested with:
-  // 1. API integration tests
-  // 2. Email mocking service
-  // 3. Manual testing with real email
+  
 });

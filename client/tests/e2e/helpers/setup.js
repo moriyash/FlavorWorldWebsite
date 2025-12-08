@@ -1,5 +1,3 @@
-// client/tests/e2e/helpers/setup.js
-
 const API_URL = 'http://localhost:3000/api';
 
 export async function clearTestDatabase() {
@@ -37,7 +35,7 @@ export async function checkDatabaseStatus() {
     
     const data = await response.json();
     console.log('Database Status:', {
-      connected: data.connected ? '✅' : '❌',
+      connected: data.connected ? 'yes' : 'no',
       database: data.database,
       mode: data.mode
     });
@@ -57,7 +55,7 @@ export function generateTestUser(prefix = 'e2e') {
     fullName: `${prefix.toUpperCase()} Test User ${random}`,
     email: `${prefix}-test-${timestamp}-${random}@test.com`,
     password: 'Test1234!',
-    confirmPassword: 'Test1234!', // ✅ הוסף את זה!
+    confirmPassword: 'Test1234!',
     bio: `Test user created at ${new Date().toISOString()}`
   };
 }
@@ -124,7 +122,6 @@ export async function waitForServer(maxAttempts = 30, delayMs = 1000) {
         return true;
       }
     } catch (error) {
-      // Server not ready yet
     }
     
     if (i < maxAttempts - 1) {
@@ -136,7 +133,6 @@ export async function waitForServer(maxAttempts = 30, delayMs = 1000) {
   throw new Error(`Server not ready after ${maxAttempts} attempts`);
 }
 
-// ✅ תקן את registerUser
 export async function registerUser(userData) {
   try {
     console.log('📤 Registering user:', userData.email);
@@ -150,13 +146,13 @@ export async function registerUser(userData) {
       body: JSON.stringify(userData)
     });
     
-    console.log('📥 Response status:', response.status);
+    console.log(' Response status:', response.status);
     
     const data = await response.json();
-    console.log('📥 Response data:', JSON.stringify(data, null, 2));
+    console.log(' Response data:', JSON.stringify(data, null, 2));
     
     if (!response.ok) {
-      console.error('❌ Registration failed:', data.message);
+      console.error(' Registration failed:', data.message);
       return {
         success: false,
         error: data.message || 'Registration failed',
@@ -164,7 +160,7 @@ export async function registerUser(userData) {
       };
     }
     
-    console.log('✅ User registered:', userData.email);
+    console.log(' User registered:', userData.email);
     
     return {
       success: true,
@@ -172,7 +168,7 @@ export async function registerUser(userData) {
       token: data.token
     };
   } catch (error) {
-    console.error('❌ Registration exception:', error.message);
+    console.error(' Registration exception:', error.message);
     return {
       success: false,
       error: error.message,
@@ -217,22 +213,21 @@ export async function loginUser(email, password) {
 }
 
 export async function setupE2ETest() {
-  console.log('🧪 Setting up E2E test environment...\n');
+  console.log(' Setting up E2E test environment...\n');
   
   await waitForServer();
   await waitForDatabase();
   await clearTestDatabase();
   
-  // Wait a bit to ensure DB is cleared
   await new Promise(resolve => setTimeout(resolve, 500));
   
-  console.log('✅ E2E test environment ready!\n');
+  console.log(' E2E test environment ready!\n');
 }
 
 export async function cleanupE2ETest() {
-  console.log('🧹 Cleaning up E2E test environment...\n');
+  console.log(' Cleaning up E2E test environment...\n');
   
   await clearTestDatabase();
   
-  console.log('✅ Cleanup complete!\n');
+  console.log(' Cleanup complete!\n');
 }

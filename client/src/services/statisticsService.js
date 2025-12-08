@@ -14,7 +14,6 @@ class StatisticsService {
       timeout: 120000,
     });
 
-    // Add interceptor for auth token
     this.api.interceptors.request.use(
       (config) => {
         const token = localStorage.getItem('userToken');
@@ -39,7 +38,6 @@ class StatisticsService {
     );
   }
 
-  // Maintain backward compatibility - if someone still uses this
   setAuthToken(token) {
     if (token) {
       localStorage.setItem('authToken', token);
@@ -286,9 +284,7 @@ class StatisticsService {
     }
   }
 
-  // New functions for React
 
-  // Cache for statistics
   cacheStatistics(userId, data) {
     try {
       const cacheKey = `statistics_${userId}`;
@@ -302,7 +298,7 @@ class StatisticsService {
     }
   }
 
-  getCachedStatistics(userId, maxAge = 5 * 60 * 1000) { // 5 minutes default
+  getCachedStatistics(userId, maxAge = 5 * 60 * 1000) { 
     try {
       const cacheKey = `statistics_${userId}`;
       const cached = localStorage.getItem(cacheKey);
@@ -331,7 +327,6 @@ class StatisticsService {
   }
 
   async getUserStatisticsWithCache(userId, useCache = true) {
-    // Try to get from cache first
     if (useCache) {
       const cached = this.getCachedStatistics(userId);
       if (cached.success) {
@@ -340,10 +335,8 @@ class StatisticsService {
       }
     }
 
-    // If no cache or expired, get from server
     const result = await this.getUserStatistics(userId);
     
-    // Save to cache if successful
     if (result.success) {
       this.cacheStatistics(userId, result.data);
     }
@@ -351,7 +344,6 @@ class StatisticsService {
     return result;
   }
 
-  // Advanced data processing
   generateInsights(statisticsData) {
     if (!statisticsData) return null;
 
@@ -381,7 +373,6 @@ class StatisticsService {
       message = 'Consider improving your content strategy.';
     }
 
-    // Calculate trend
     let trend = 'stable';
     if (likesProgression.length >= 3) {
       const recent = likesProgression.slice(-3).map(p => p.likes);
@@ -408,14 +399,12 @@ class StatisticsService {
   analyzeTrends(data) {
     const { categoriesDistribution, likesProgression } = data;
     
-    // Most popular category
     const topCategory = categoriesDistribution.length > 0 
       ? categoriesDistribution.reduce((prev, current) => 
           prev.count > current.count ? prev : current
         )
       : null;
 
-    // Most successful post
     const topPost = likesProgression.length > 0
       ? likesProgression.reduce((prev, current) => 
           prev.likes > current.likes ? prev : current
@@ -477,7 +466,6 @@ class StatisticsService {
     return recommendations;
   }
 
-  // Helper functions for visualization
   prepareChartData(statisticsData, chartType) {
     switch (chartType) {
       case 'likesProgression':
@@ -518,20 +506,17 @@ class StatisticsService {
     }));
   }
 
-  // Function for real-time statistics updates
   subscribeToStatisticsUpdates(userId, callback) {
     const interval = setInterval(async () => {
       const result = await this.getUserStatistics(userId);
       if (result.success && callback) {
         callback(result.data);
       }
-    }, 60000); // Update every minute
+    }, 60000); 
 
-    // Return unsubscribe function
     return () => clearInterval(interval);
   }
 
-  // Data export
   exportStatistics(statisticsData, format = 'json') {
     const exportData = {
       ...statisticsData,
@@ -552,7 +537,6 @@ class StatisticsService {
   }
 
   convertToCSV(data) {
-    // Simple CSV conversion for basic data
     const headers = ['Metric', 'Value'];
     const rows = [
       ['Total Posts', data.totalPosts],

@@ -12,7 +12,6 @@ class UserService {
       timeout: 120000,
     });
 
-    // Add auth token interceptor
     this.api.interceptors.request.use(
       (config) => {
         const token = localStorage.getItem('userToken');
@@ -20,7 +19,6 @@ class UserService {
           config.headers.Authorization = `Bearer ${token}`;
         }
         
-        // Add user ID if exists
         const currentUser = this.getCurrentUser();
         if (currentUser?.id) {
           config.headers['x-user-id'] = currentUser.id;
@@ -34,7 +32,6 @@ class UserService {
     );
   }
 
-  // Helper function to get current user
   getCurrentUser() {
     try {
       const user = localStorage.getItem('user');
@@ -49,7 +46,6 @@ class UserService {
     try {
       console.log('UserService: Searching users for:', query);
       
-      // If currentUserId not provided, try to get from localStorage
       if (!currentUserId) {
         const currentUser = this.getCurrentUser();
         currentUserId = currentUser?.id || 'temp-user-id';
@@ -97,7 +93,6 @@ class UserService {
         if (response.data.success || response.status === 200) {
           console.log('User account deleted successfully');
           
-          // Clear localStorage after account deletion
           localStorage.removeItem('userToken');
           localStorage.removeItem('userData');
           localStorage.removeItem('user');
@@ -109,7 +104,6 @@ class UserService {
           };
         }
       } catch (error) {
-        // If we get a 401 error, it means wrong password
         if (error.response && error.response.status === 401) {
           console.error('Password validation failed');
           return {
@@ -118,7 +112,6 @@ class UserService {
           };
         }
         
-        // If network error (server not running), give helpful message
         if (!error.response && error.code === 'ERR_NETWORK') {
           return {
             success: false,
@@ -126,7 +119,6 @@ class UserService {
           };
         }
         
-        // Other errors
         console.error('Delete account error:', error);
         return {
           success: false,
@@ -159,7 +151,6 @@ class UserService {
         };
       }
       
-      // Only try the user endpoints
       const endpoints = [
         { url: '/api/user/change-password', method: 'put' },
         { url: '/api/user/change-password', method: 'patch' }
@@ -190,7 +181,6 @@ class UserService {
           console.log(`${endpoint.url} - Status: ${status}, Error: ${errorMsg || error.message}`);
           
           if (error.response) {
-            // Return specific errors immediately
             if (status === 401) {
               return {
                 success: false,
@@ -233,7 +223,6 @@ class UserService {
     try {
       console.log('Uploading avatar...');
       
-      // Validate that formData is FormData
       if (!(formData instanceof FormData)) {
         return {
           success: false,
@@ -263,7 +252,6 @@ class UserService {
             
             const avatarUrl = response.data.url || response.data.avatarUrl;
             
-            // Update user in localStorage
             const currentUser = this.getCurrentUser();
             if (currentUser && avatarUrl) {
               currentUser.avatar = avatarUrl;
@@ -282,12 +270,10 @@ class UserService {
         } catch (error) {
           console.log(`Endpoint ${endpoint} error:`, error.response?.data?.error || error.message);
           
-          // If we got a response with error, try next endpoint
           if (error.response?.status === 404 || error.response?.status === 500) {
             continue;
           }
           
-          // If it's a validation error, return it
           if (error.response?.status === 400 || error.response?.status === 413) {
             return {
               success: false,
@@ -299,7 +285,6 @@ class UserService {
         }
       }
 
-      // If all endpoints failed, return success: false but don't block profile update
       console.log('All avatar upload endpoints failed');
       return {
         success: false,
@@ -344,7 +329,6 @@ class UserService {
 
           console.log('Profile updated successfully via:', endpoint.url);
           
-          // Update user details in localStorage
           const currentUser = this.getCurrentUser();
           if (currentUser && response.data.user) {
             const updatedUser = { ...currentUser, ...response.data.user };
@@ -413,9 +397,7 @@ class UserService {
     }
   }
 
-  // New functions for React
 
-  // Image file validation
   validateImageFile(file) {
     if (!file) return { valid: false, message: 'No file selected' };
     
@@ -427,7 +409,7 @@ class UserService {
       };
     }
     
-    const maxSize = 5 * 1024 * 1024; // 5MB
+    const maxSize = 5 * 1024 * 1024; 
     if (file.size > maxSize) {
       return { 
         valid: false, 
@@ -438,7 +420,6 @@ class UserService {
     return { valid: true };
   }
 
-  // Create avatar preview
   createAvatarPreview(file) {
     return new Promise((resolve) => {
       if (!file) {
@@ -458,7 +439,6 @@ class UserService {
     });
   }
 
-  // Compress avatar image
   compressAvatar(file, maxSize = 150) {
     return new Promise((resolve) => {
       const canvas = document.createElement('canvas');
@@ -466,12 +446,10 @@ class UserService {
       const img = new Image();
 
       img.onload = () => {
-        // Create square image
         const size = Math.min(img.width, img.height);
         canvas.width = maxSize;
         canvas.height = maxSize;
 
-        // Crop to square and resize
         const sx = (img.width - size) / 2;
         const sy = (img.height - size) / 2;
         
@@ -484,7 +462,6 @@ class UserService {
     });
   }
 
-  // Strong password validation
   validatePassword(password) {
     const requirements = {
       minLength: password.length >= 8,
@@ -524,7 +501,6 @@ class UserService {
     return `Password needs: ${missing.join(', ')}`;
   }
 
-  // Cache for user profiles
   cacheUserProfile(userId, profileData) {
     try {
       const cacheKey = `userProfile_${userId}`;
@@ -538,7 +514,7 @@ class UserService {
     }
   }
 
-  getCachedUserProfile(userId, maxAge = 10 * 60 * 1000) { // 10 minutes
+  getCachedUserProfile(userId, maxAge = 10 * 60 * 1000) { 
     try {
       const cacheKey = `userProfile_${userId}`;
       const cached = localStorage.getItem(cacheKey);
@@ -567,7 +543,6 @@ class UserService {
   }
 
   async getUserProfileWithCache(userId, useCache = true) {
-    // Try to get from cache first
     if (useCache) {
       const cached = this.getCachedUserProfile(userId);
       if (cached.success) {
@@ -576,10 +551,8 @@ class UserService {
       }
     }
 
-    // If no cache or expired, get from server
     const result = await this.getUserProfile(userId);
     
-    // Save to cache if successful
     if (result.success) {
       this.cacheUserProfile(userId, result.data);
     }
@@ -587,7 +560,6 @@ class UserService {
     return result;
   }
 
-  // Format file size
   formatFileSize(bytes) {
     if (bytes === 0) return '0 Bytes';
     
@@ -598,13 +570,11 @@ class UserService {
     return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
   }
 
-  // Clear all user-related data
   clearUserData() {
     localStorage.removeItem('userToken');
     localStorage.removeItem('userData');
     localStorage.removeItem('user');
     
-    // Clear cached profiles
     const keys = Object.keys(localStorage);
     keys.forEach(key => {
       if (key.startsWith('userProfile_')) {
@@ -613,16 +583,14 @@ class UserService {
     });
   }
 
-  // Subscribe to profile updates
   subscribeToProfileUpdates(userId, callback) {
     const interval = setInterval(async () => {
       const result = await this.getUserProfile(userId);
       if (result.success && callback) {
         callback(result.data);
       }
-    }, 60000); // Update every minute
+    }, 60000); 
 
-    // Return unsubscribe function
     return () => clearInterval(interval);
   }
 
@@ -639,7 +607,6 @@ class UserService {
     } catch (error) {
       console.error('Get friends error:', error);
       
-      // If endpoint doesn't exist, return empty array
       if (error.response?.status === 404) {
         return {
           success: true,

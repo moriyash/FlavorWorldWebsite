@@ -10,7 +10,6 @@ export default (io) => {
   io.on('connection', (socket) => {
     console.log(' User connected:', socket.id);
     
-    // PRIVATE CHAT HANDLERS
     
     socket.on('join_chat', (chatId) => {
       socket.join(chatId);
@@ -152,7 +151,6 @@ export default (io) => {
       console.log(` User ${userId} stopped typing`);
     });
 
-    // GROUP CHAT HANDLERS
 
     socket.on('join_group_chat', (chatId) => {
       socket.join(chatId);
@@ -295,7 +293,6 @@ export default (io) => {
     });
 
    
-    // DISCONNECT
 
     socket.on('disconnect', () => {
       console.log(' User disconnected:', socket.id);

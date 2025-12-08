@@ -240,7 +240,6 @@ const ChatConversationScreen = () => {
 
   const handleRecipeClick = (url) => {
     if (url) {
-      // Extract post ID from URL
       const postIdMatch = url.match(/\/post\/([^/?]+)/);
       if (postIdMatch) {
         const postId = postIdMatch[1];

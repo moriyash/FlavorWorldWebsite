@@ -62,7 +62,6 @@ const GroupChatCreationScreen = () => {
 
       const availableUsers = [];
       
-      // Load following users
       try {
         const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
         const response = await fetch(`${API_BASE_URL}/api/users/${currentUserId}/following`, {
@@ -89,7 +88,6 @@ const GroupChatCreationScreen = () => {
         console.error('Error loading following users:', error);
       }
       
-      // Load users from existing chats
       try {
         const chatsResult = await chatService.getMyChats();
         
@@ -99,10 +97,8 @@ const GroupChatCreationScreen = () => {
               const existingIndex = availableUsers.findIndex(u => u.userId === chat.otherUser.userId);
               
               if (existingIndex >= 0) {
-                // Update existing user to mark they have a chat
                 availableUsers[existingIndex].hasPrivateChat = true;
               } else {
-                // Add new user from chat
                 availableUsers.push({
                   userId: chat.otherUser.userId,
                   userName: chat.otherUser.userName || 'Unknown User',

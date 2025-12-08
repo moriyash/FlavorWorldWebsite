@@ -8,7 +8,6 @@ import User from '../models/User.js';
 
 const router = express.Router();
 
-// CREATE GROUP
 router.post('/', upload.any(), async (req, res) => {
   try {
     console.log('=== Create Group Debug ===');
@@ -88,7 +87,6 @@ router.post('/', upload.any(), async (req, res) => {
   }
 });
 
-// SEARCH GROUPS
 router.get('/search', async (req, res) => {
   try {
     console.log('Groups search request:', req.query);
@@ -189,7 +187,6 @@ router.get('/search', async (req, res) => {
   }
 });
 
-// GET ALL GROUPS
 router.get('/', async (req, res) => {
   try {
     if (!isMongoConnected()) {
@@ -231,7 +228,6 @@ router.get('/', async (req, res) => {
   }
 });
 
-// GET SINGLE GROUP
 router.get('/:id', async (req, res) => {
   try {
     console.log('Get single group request:', req.params.id);
@@ -401,7 +397,6 @@ router.get('/:id', async (req, res) => {
   }
 });
 
-// JOIN GROUP
 router.post('/:groupId/join', async (req, res) => {
   try {
     console.log('Join group request:', req.params.groupId);
@@ -527,7 +522,6 @@ router.put('/:id/requests/:userId', async (req, res) => {
   }
 });
 
-// CANCEL JOIN REQUEST
 router.delete('/:groupId/join', async (req, res) => {
   try {
     console.log('Canceling join request for group:', req.params.groupId);
@@ -589,7 +583,6 @@ router.delete('/:groupId/join', async (req, res) => {
   }
 });
 
-// LEAVE GROUP (legacy endpoint)
 router.delete('/:id/members/:userId', async (req, res) => {
   try {
     if (!isMongoConnected()) {
@@ -618,7 +611,6 @@ router.delete('/:id/members/:userId', async (req, res) => {
   }
 });
 
-// LEAVE GROUP (new endpoint)
 router.delete('/:groupId/leave/:userId', async (req, res) => {
   try {
     console.log('User leaving group');
@@ -662,7 +654,6 @@ router.delete('/:groupId/leave/:userId', async (req, res) => {
   }
 });
 
-// UPDATE GROUP
 router.put('/:id', upload.any(), async (req, res) => {
   try {
     if (!isMongoConnected()) {
@@ -713,14 +704,12 @@ router.put('/:id', upload.any(), async (req, res) => {
 
     console.log('Permission granted');
 
-    // Update basic fields
     if (name) group.name = name;
     if (description !== undefined) group.description = description;
     if (category) group.category = category;
     if (rules !== undefined) group.rules = rules;
     if (isPrivate !== undefined) group.isPrivate = isPrivate === 'true' || isPrivate === true;
 
-    // Update settings
     if (!group.settings) group.settings = {};
     
     if (allowMemberPosts !== undefined) {
@@ -740,7 +729,6 @@ router.put('/:id', upload.any(), async (req, res) => {
       group.allowInvites = group.settings.allowInvites; 
     }
 
-    // Handle image update
     if (req.files && req.files.length > 0) {
       const imageFile = req.files.find(file => 
         file.fieldname === 'image' || 
@@ -773,7 +761,6 @@ router.put('/:id', upload.any(), async (req, res) => {
   }
 });
 
-// DELETE GROUP
 router.delete('/:id', async (req, res) => {
   try {
     if (!isMongoConnected()) {
@@ -940,7 +927,6 @@ router.get('/:groupId/members', async (req, res) => {
   }
 });
 
-// UPDATE MEMBER ROLE
 router.put('/:groupId/members/:memberUserId/role', async (req, res) => {
   try {
     console.log('Updating member role');
@@ -1006,7 +992,6 @@ router.put('/:groupId/members/:memberUserId/role', async (req, res) => {
   }
 });
 
-// REMOVE MEMBER
 router.delete('/:groupId/members/:memberUserId', async (req, res) => {
   try {
     console.log('Removing member from group');

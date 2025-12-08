@@ -196,7 +196,6 @@ const ProfileScreen = () => {
           let followingCount = 0;
           
           try {
-            // Get actual followers/following counts from the backend
             const [followersResult, followingResult] = await Promise.all([
               followService.getFollowers(userId),
               followService.getFollowing(userId)
@@ -264,17 +263,15 @@ const ProfileScreen = () => {
       let result;
       
       if (isFollowing) {
-        // Unfollow
+         
         result = await followService.unfollowUser(userId, currentUserId);
       } else {
-        // Follow
         result = await followService.followUser(userId, currentUserId);
       }
       
       if (result.success) {
         setIsFollowing(!isFollowing);
         
-        // Get updated follower count from backend
         try {
           const followersResult = await followService.getFollowers(userId);
           if (followersResult.success && Array.isArray(followersResult.data)) {
@@ -283,7 +280,6 @@ const ProfileScreen = () => {
               followersCount: followersResult.data.length
             }));
           } else {
-            // Fallback to manual calculation
             setStats(prev => ({
               ...prev,
               followersCount: isFollowing ? prev.followersCount - 1 : prev.followersCount + 1
@@ -291,7 +287,6 @@ const ProfileScreen = () => {
           }
         } catch (error) {
           console.error('Error getting updated count:', error);
-          // Fallback to manual calculation
           setStats(prev => ({
             ...prev,
             followersCount: isFollowing ? prev.followersCount - 1 : prev.followersCount + 1
@@ -369,7 +364,6 @@ const ProfileScreen = () => {
         alert('Your account has been permanently deleted. Thank you for using FlavorWorld.');
         setShowDeleteModal(false);
         
-        // Disconnect socket connections before logout
         try {
           const { chatService } = await import('../../services/chatServices');
           chatService.disconnect();
@@ -377,10 +371,8 @@ const ProfileScreen = () => {
           console.error('Error disconnecting chat service:', error);
         }
         
-        // Logout and clear all auth state
         await logout();
         
-        // Navigate to login page after logout
         navigate('/login', { replace: true });
       } else {
         alert(result.message || 'Failed to delete account. Please try again or contact support.');

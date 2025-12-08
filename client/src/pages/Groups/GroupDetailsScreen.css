@@ -1,5 +1,3 @@
-/* GroupDetailsScreen.css */
-
 .group-details-screen {
   min-height: 100vh;
   background: linear-gradient(135deg, #FFF8F0 0%, #F7F0E6 100%);
@@ -7,7 +5,6 @@
   flex-direction: column;
 }
 
-/* Header */
 .group-header {
   position: sticky;
   top: 0;
@@ -117,7 +114,6 @@
   width: 44px;
 }
 
-/* Options Menu */
 .options-menu {
   position: absolute;
   top: 60px;
@@ -168,7 +164,6 @@
   color: var(--text-light);
 }
 
-/* Loading & Error */
 .loading-container,
 .error-container {
   flex: 1;
@@ -229,7 +224,6 @@
   box-shadow: 0 8px 20px rgba(245, 166, 35, 0.35);
 }
 
-/* Content */
 .group-content {
   flex: 1;
   overflow-y: auto;
@@ -240,7 +234,6 @@
   margin-right: auto;
 }
 
-/* Group Info Section */
 .group-info-section {
   background: var(--white);
   margin-bottom: 16px;

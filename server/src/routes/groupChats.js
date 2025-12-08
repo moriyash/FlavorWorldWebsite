@@ -8,7 +8,6 @@ import User from '../models/User.js';
 
 const router = express.Router();
 
-// CREATE GROUP CHAT
 router.post('/', async (req, res) => {
   try {
     console.log('=== Creating Group Chat ===');
@@ -97,7 +96,6 @@ router.post('/', async (req, res) => {
   }
 });
 
-// GET MY GROUP CHATS
 router.get('/my', async (req, res) => {
   try {
     if (!isMongoConnected()) {
@@ -133,7 +131,6 @@ router.get('/my', async (req, res) => {
   }
 });
 
-// GET SINGLE GROUP CHAT
 router.get('/:chatId', async (req, res) => {
   try {
     if (!isMongoConnected()) {
@@ -175,7 +172,6 @@ router.get('/:chatId', async (req, res) => {
   }
 });
 
-// GET GROUP CHAT MESSAGES
 router.get('/:chatId/messages', async (req, res) => {
   try {
     if (!isMongoConnected()) {
@@ -220,7 +216,6 @@ router.get('/:chatId/messages', async (req, res) => {
   }
 });
 
-// SEND MESSAGE TO GROUP CHAT
 router.post('/:chatId/messages', async (req, res) => {
   try {
     if (!isMongoConnected()) {
@@ -288,7 +283,6 @@ router.post('/:chatId/messages', async (req, res) => {
   }
 });
 
-// ADD PARTICIPANTS
 router.post('/:chatId/participants', async (req, res) => {
   try {
     if (!isMongoConnected()) {
@@ -370,7 +364,6 @@ router.post('/:chatId/participants', async (req, res) => {
   }
 });
 
-// REMOVE PARTICIPANT
 router.delete('/:chatId/participants/:userId', async (req, res) => {
   try {
     if (!isMongoConnected()) {
@@ -429,7 +422,6 @@ router.delete('/:chatId/participants/:userId', async (req, res) => {
   }
 });
 
-// LEAVE GROUP CHAT
 router.delete('/:chatId/leave', async (req, res) => {
   try {
     if (!isMongoConnected()) {
@@ -509,7 +501,6 @@ router.delete('/:chatId/leave', async (req, res) => {
   }
 });
 
-// UPDATE GROUP CHAT
 router.put('/:chatId', async (req, res) => {
   try {
     if (!isMongoConnected()) {
@@ -655,7 +646,6 @@ router.put('/:chatId', async (req, res) => {
   }
 });
 
-// MARK AS READ
 router.put('/:chatId/read', async (req, res) => {
   try {
     if (!isMongoConnected()) {
@@ -700,7 +690,6 @@ router.put('/:chatId/read', async (req, res) => {
   }
 });
 
-// GET AVAILABLE USERS FOR GROUP CHAT
 router.get('/available-users', async (req, res) => {
   try {
     if (!isMongoConnected()) {
